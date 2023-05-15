@@ -1,21 +1,26 @@
 use super::Detector;
+use crate::utils::file_processor::FileNameWithContent;
+use solang_parser::pt::SourceUnitPart;
+
 pub struct PragmaVersionDetector;
-use solang_parser::pt::{SourceUnit, SourceUnitPart};
 
 impl Detector for PragmaVersionDetector {
-    fn run_detector(&self, parsed_file: &SourceUnit) {
-        for part in &parsed_file.0 {
+    fn run_detector(&self, parsed_file: &FileNameWithContent) {
+        for part in &parsed_file.parsed_ast_tree.0 {
             match part {
                 SourceUnitPart::PragmaDirective(def, _opt, _opt_lit) => {
                     let pragma_version = _opt_lit.as_ref().map(|s| s.string.clone()).unwrap();
-                    println!("\n{:?}", pragma_version);
-
-                    if !pragma_version.contains("^") && !pragma_version.contains(">") {
-                        print!("Replace fixed pragma version");
-                    }
+                    self.detector_logic(&pragma_version);
                 }
                 _ => (),
             }
+        }
+    }
+
+    fn detector_logic(&self, content: &str) {
+        println!("{content}");
+        if !content.contains("^") && !content.contains(">") {
+            println!("Replace fixed pragma version");
         }
     }
 }

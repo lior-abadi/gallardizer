@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 solang-parser = "0.2.4"
+walkdir = "2.3.3"
 

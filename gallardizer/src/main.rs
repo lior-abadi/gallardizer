@@ -12,7 +12,8 @@ fn main() {
 }
 
 fn run_detectors() {
-    let solidity_files: Vec<String> = file_processor::get_all_solidity_files("./");
+    let solidity_files: Vec<file_processor::FileNameWithContent> =
+        file_processor::get_all_solidity_files("./");
 
-    gallardizer::gallardize(solidity_files.iter().map(|s| s.as_str()).collect())
+    gallardizer::gallardize(solidity_files)
 }
