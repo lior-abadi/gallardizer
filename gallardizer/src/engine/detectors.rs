@@ -1,4 +1,4 @@
-use super::report_generator::{Issue, IssueAppearance, IssueMetadata};
+use super::report_generator::{generate_report_locally, Issue, IssueAppearance, IssueMetadata};
 use crate::utils::file_processor::FileNameWithContent;
 
 pub trait Detector {
@@ -32,17 +32,12 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) {
         all_detected_issues.push(current_issue);
     }
 
-    // Use the collected detected issues for further processing
-    // (e.g., generating a report)
+    // Generate the formatted report with each issue
     for detected_issue in &all_detected_issues {
-        // Process the detected issues as needed
-        println!("Detector: {}", detected_issue.metadata.title);
-        println!("Severity: {:?}", detected_issue.metadata.severity);
-        for issue_appearance in &detected_issue.issue_appearances {
-            println!("Issue: {:?}", issue_appearance);
-        }
-        println!("---");
+        // In here add real-time detection feed.
     }
+
+    generate_report_locally(all_detected_issues);
 }
 
 fn get_all_detectors() -> Vec<Box<dyn Detector>> {

@@ -1,8 +1,5 @@
 use crate::utils::file_processor::FileNameWithContent;
-use solang_parser::{
-    parse,
-    pt::{ContractPart, SourceUnit, SourceUnitPart},
-};
+use solang_parser::parse;
 
 pub fn parse_targets(targets: Vec<FileNameWithContent>) -> Vec<FileNameWithContent> {
     let mut parsed_files: Vec<FileNameWithContent> = Vec::new();
