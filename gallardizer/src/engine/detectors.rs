@@ -1,26 +1,19 @@
-pub mod pragma_version;
-
 use super::report_generator::{Issue, IssueAppearance, IssueMetadata};
 use crate::utils::file_processor::FileNameWithContent;
 
 pub trait Detector {
-    fn run_detector(&self, parsed_file: &FileNameWithContent);
+    fn run_detector(&mut self, parsed_file: &FileNameWithContent);
     fn get_detector_name(&self) -> String;
     fn get_metadata(&self) -> IssueMetadata;
     fn get_detected_issues(&self) -> Vec<IssueAppearance>;
 }
 
 pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) {
-    let detectors: Vec<Box<dyn Detector>> = vec![
-        Box::new(pragma_version::PragmaVersionDetector {
-            detected_issues: Vec::new(),
-        }),
-        /* Add more detector modules */
-    ];
+    let detectors: Vec<Box<dyn Detector>> = get_all_detectors();
 
     let mut all_detected_issues: Vec<Issue> = Vec::new();
 
-    for detector in detectors {
+    for mut detector in detectors {
         let detector_name = detector.get_detector_name();
 
         for file in &parsed_files {
@@ -44,10 +37,21 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) {
     for detected_issue in &all_detected_issues {
         // Process the detected issues as needed
         println!("Detector: {}", detected_issue.metadata.title);
-        println!("Contract: {:?}", detected_issue.metadata.severity);
+        println!("Severity: {:?}", detected_issue.metadata.severity);
         for issue_appearance in &detected_issue.issue_appearances {
             println!("Issue: {:?}", issue_appearance);
         }
         println!("---");
     }
 }
+
+fn get_all_detectors() -> Vec<Box<dyn Detector>> {
+    return vec![
+        Box::new(pragma_version::PragmaVersionDetector {
+            detected_issues: Vec::new(),
+        }),
+        /* Add more detector modules */
+    ];
+}
+
+pub mod pragma_version;

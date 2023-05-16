@@ -4,24 +4,31 @@ use crate::utils::file_processor::FileNameWithContent;
 use solang_parser::pt::SourceUnitPart;
 
 pub struct PragmaVersionDetector {
-    detected_issues: Vec<IssueAppearance>,
+    pub detected_issues: Vec<IssueAppearance>,
 }
 
 impl Detector for PragmaVersionDetector {
-    fn run_detector(&self, parsed_file: &FileNameWithContent) {
+    fn run_detector(&mut self, parsed_file: &FileNameWithContent) {
         for part in &parsed_file.parsed_ast_tree.0 {
             match part {
                 SourceUnitPart::PragmaDirective(def, _opt, _opt_lit) => {
                     let pragma_version = _opt_lit.as_ref().map(|s| s.string.clone()).unwrap();
                    
-                    if !&pragma_version.contains("^") && !&pragma_version.contains(">") {
-                        println!("Replace fixed pragma version");
+                    
+                    let detected: bool = check_floating_pragma(&pragma_version) || check_pragma_version(&pragma_version);
+                    println!("{pragma_version} - PragmaVersionIssue: {detected}");
+
+                    if detected {
+                        let issue_appearance: IssueAppearance = IssueAppearance { file_path: (parsed_file.file_path.clone()), line: (0), content: (pragma_version) };
+                        self.detected_issues.push(issue_appearance);
                     }
+                    
                 }
                 _ => (),
             }
         }
     }
+
     fn get_detected_issues(&self) -> Vec<IssueAppearance>{
         return self.detected_issues.clone();
     }
@@ -56,3 +63,21 @@ impl Detector for PragmaVersionDetector {
  
 }
 
+fn check_floating_pragma(content: &str) -> bool {
+    return content.contains("^") || content.contains(">")
+}
+
+fn check_pragma_version(content: &str) -> bool {
+    let parts: Vec<&str> = content.split('.').collect();
+
+    // We ensure that the pragma format is X.Y.Z (e.g. 0.8.9)
+    if parts.len() >= 3 {
+        if let (Some(second), Some(last)) = (parts[1].parse::<u32>().ok(), parts[2].parse::<u32>().ok()) {
+            if second < 8 || (second >= 8 && last < 8) {                
+                return true;
+            }            
+        }
+    }
+
+    return false;
+}

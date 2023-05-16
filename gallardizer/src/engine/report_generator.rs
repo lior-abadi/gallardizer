@@ -4,7 +4,6 @@ pub struct GasParams {
 }
 
 #[derive(Debug, Clone)]
-
 pub enum Severities {
     GAS(GasParams),
     NC,
@@ -14,15 +13,13 @@ pub enum Severities {
 }
 
 #[derive(Debug, Clone)]
-
 pub struct IssueAppearance {
     pub file_path: String,
-    pub line: String,
+    pub line: u16,
     pub content: String,
 }
 
 #[derive(Debug, Clone)]
-
 pub struct IssueMetadata {
     pub title: String,
     pub content: String,
