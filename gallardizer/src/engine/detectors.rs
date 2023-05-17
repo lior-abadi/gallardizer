@@ -49,4 +49,34 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
     ];
 }
 
+pub fn get_issue_line_number(source: &str, position: &usize) -> Option<u32> {
+    let mut lines = source.lines().enumerate();
+    let mut line_number: u32 = 1;
+    let mut current_position = 0;
+
+    while let Some((line, text)) = lines.next() {
+        let trimmed_text = text.trim();
+        let line_length = trimmed_text.len() + 1; // Add 1 for the newline character
+        let next_position = current_position + line_length;
+
+        if &next_position > position {
+            return Some(line_number);
+        }
+
+        line_number += 1;
+        current_position = next_position;
+    }
+
+    None
+}
+
+pub fn extract_line_from_content(content: &str, line_number: usize) -> Option<&str> {
+    let lines: Vec<&str> = content.lines().collect();
+    if line_number <= lines.len() {
+        Some(lines[line_number - 1])
+    } else {
+        None
+    }
+}
+
 pub mod pragma_version;

@@ -2,24 +2,20 @@ use crate::utils::markdown_generator::{AsMarkdown, Markdown};
 use std::fs::{self, File};
 use std::path::Path;
 
-#[derive(Debug, Clone)]
-pub struct GasParams {
-    pub amount: i64,
-}
-
 #[warn(dead_code)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Severities {
-    GAS(GasParams),
+    Gas,
     NC,
     L,
     M,
     H,
 }
+
 impl Severities {
     pub fn to_string(&self) -> String {
         match self {
-            Severities::GAS(_) => "GAS".to_string(),
+            Severities::Gas => "G".to_string(),
             Severities::NC => "NC".to_string(),
             Severities::L => "L".to_string(),
             Severities::M => "M".to_string(),
@@ -31,7 +27,7 @@ impl Severities {
 #[derive(Debug, Clone)]
 pub struct IssueAppearance {
     pub file_path: String,
-    pub line: u16,
+    pub line: u32,
     pub content: String,
 }
 
@@ -40,6 +36,7 @@ pub struct IssueMetadata {
     pub title: String,
     pub content: String,
     pub severity: Severities,
+    pub gas_saved_per_instance: i64,
 }
 
 // An issue is composed by several appearances
@@ -86,40 +83,145 @@ pub fn generate_report_at_dir(dir: &str, issues: Vec<Issue>) {
     };
     generate_report(report_file, issues);
 }
-
 fn generate_report(file: File, issues: Vec<Issue>) {
     let mut md = Markdown::new(file);
 
-    for issue in &issues {
-        let times_found: usize = issue.issue_appearances.len();
-        let formatted_issue: FormattedIssue = format_issue(&1, issue, &times_found);
+    // Sort the issues by severity in the desired order
+    let mut sorted_issues: Vec<&Issue> = issues.iter().collect();
+    sorted_issues.sort_by_key(|issue| match issue.metadata.severity {
+        Severities::H => 0,
+        Severities::M => 1,
+        Severities::L => 2,
+        Severities::NC => 3,
+        Severities::Gas => 4,
+    });
 
-        // Add the title
-        md.write(&formatted_issue.heading.heading(2)).unwrap();
+    let issue_summary_header = format!("Issues Summary");
+    md.write(issue_summary_header.heading(1)).unwrap();
 
-        // Add the description body
-        md.write(issue.metadata.content.paragraph()).unwrap();
+    // Generate the report for each severity group
+    for severity in &[
+        Severities::H,
+        Severities::M,
+        Severities::L,
+        Severities::NC,
+        Severities::Gas, // Replace with the actual GasParams value if available
+    ] {
+        // Filter the issues for the current severity
+        let severity_issues: Vec<&Issue> = sorted_issues
+            .iter()
+            .filter(|issue| issue.metadata.severity == *severity)
+            .copied()
+            .collect();
 
-        // Add the occurrences
-        md.write(formatted_issue.times_found.italic().paragraph())
-            .unwrap();
+        if !severity_issues.is_empty() {
+            // Add the severity heading
+            let severity_header = severity_enum_to_title(severity);
+            md.write(severity_header.heading(2)).unwrap();
+
+            //  generate_summary_table(&mut md, &severity_issues);
+            let issues_found: usize = severity_issues.len();
+            let mut total_issue_instances: usize = 0;
+
+            for issue in severity_issues {
+                total_issue_instances += issue.issue_appearances.len();
+            }
+
+            let instance_word = if (total_issue_instances != 1) {
+                "instances".to_string()
+            } else {
+                "instance".to_string()
+            };
+
+            let issue_word = if (issues_found != 1) {
+                "issues".to_string()
+            } else {
+                "issue".to_string()
+            };
+
+            let instances_detail = format!(
+                "Total: {} {instance_word} were found over {} {issue_word}.",
+                &total_issue_instances.to_string(),
+                &issues_found.to_string()
+            );
+
+            md.write(instances_detail.paragraph()).unwrap();
+            md.write("\n\n").unwrap();
+        }
+    }
+
+    // Generate the report for each severity group
+    for severity in &[
+        Severities::H,
+        Severities::M,
+        Severities::L,
+        Severities::NC,
+        Severities::Gas, // Replace with the actual GasParams value if available
+    ] {
+        // Filter the issues for the current severity
+        let severity_issues: Vec<&Issue> = sorted_issues
+            .iter()
+            .filter(|issue| issue.metadata.severity == *severity)
+            .copied()
+            .collect();
+
+        if !severity_issues.is_empty() {
+            // Add the severity heading
+            let severity_header = severity_enum_to_title(severity);
+            md.write(severity_header.heading(1)).unwrap();
+
+            // Add the summary table
+            //  generate_summary_table(&mut md, &severity_issues);
+
+            // Add the findings for each issue
+            let mut position_id: u32 = 1;
+            for issue in severity_issues {
+                let issue_instances: usize = issue.issue_appearances.len();
+                format_issue(&mut md, issue, &position_id, &issue_instances);
+                position_id += 1;
+            }
+
+            // Add a newline for readability between severity groups
+            md.write("\n\n").unwrap();
+        }
     }
 }
 
-struct FormattedIssue {
-    heading: String,
-    times_found: String,
-}
+// fn generate_report_summary(md: &Markdown<File>)
 
-fn format_issue(position: &u16, issue: &Issue, times_found: &usize) -> FormattedIssue {
+// Generate the details for an individual issue
+fn format_issue(md: &mut Markdown<File>, issue: &Issue, position: &u32, times_found: &usize) {
     let full_header = format!("[{}-{}]", &issue.metadata.severity.to_string(), &position)
         + " "
         + &issue.metadata.title;
     let times_found_prompt = times_found_text(times_found);
 
-    return FormattedIssue {
-        heading: (full_header),
-        times_found: (times_found_prompt),
+    // Add the issue title
+    md.write(full_header.heading(2)).unwrap();
+
+    // Add the issue description
+    md.write(issue.metadata.content.paragraph()).unwrap();
+
+    // Add the instances
+    md.write(times_found_prompt.italic().paragraph()).unwrap();
+
+    // Add the code blocks for each occurrence
+    for appearance in &issue.issue_appearances {
+        md.write(appearance.content.paragraph()).unwrap();
+        md.write("\n").unwrap();
+    }
+
+    // Add a newline for readability between issues
+    md.write("\n").unwrap();
+}
+
+fn severity_enum_to_title(severity: &Severities) -> String {
+    return match severity {
+        Severities::Gas => "Gas Optimizations".to_string(),
+        Severities::NC => "Non-Critical Issues".to_string(),
+        Severities::L => "Low Risk Issues".to_string(),
+        Severities::M => "Medium Risk Issues".to_string(),
+        Severities::H => "High Risk Issues".to_string(),
     };
 }
 
@@ -130,3 +232,5 @@ fn times_found_text(times_found: &usize) -> String {
 
     return format!("This issue found {} time:", times_found);
 }
+
+fn generate_summary_tables(issues: &Vec<Issue>) {}

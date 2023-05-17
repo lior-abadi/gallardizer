@@ -885,3 +885,20 @@ fn write_line_prefixed<W: Write + ?Sized>(
 
     Ok(())
 }
+
+pub fn create_markdown_table(headers: &[&str], rows: &[(&str, &str, u32, &str)]) -> String {
+    let header_row = headers.join(" | ");
+    let header_separator = headers
+        .iter()
+        .map(|_| "---")
+        .collect::<Vec<_>>()
+        .join(" | ");
+    let mut table = vec![header_row, header_separator];
+
+    for row in rows {
+        let row_str = format!("{} | {} | {} | {}", row.0, row.1, row.2, row.3);
+        table.push(row_str);
+    }
+
+    table.join("\n")
+}

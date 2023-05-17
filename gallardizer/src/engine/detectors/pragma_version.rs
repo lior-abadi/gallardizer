@@ -1,8 +1,9 @@
 use super::Detector;
+use crate::engine::detectors::{extract_line_from_content, get_issue_line_number};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
-use solang_parser::pt::SourceUnitPart;
+use solang_parser::pt::{Loc, SourceUnitPart};
 
 pub struct PragmaVersionDetector {
     pub detected_issues: Vec<IssueAppearance>,
@@ -17,13 +18,44 @@ impl Detector for PragmaVersionDetector {
 
                     let detected: bool = check_floating_pragma(&pragma_version)
                         || check_pragma_version(&pragma_version);
+
+                    // println!("{:?}", def);
+                    // println!(" ");
+
+                    // println!("{:?}", _opt);
+                    // println!(" ");
+
+                    // println!("{:?}", _opt_lit);
+                    // println!(" ");
+
                     println!("{pragma_version} - PragmaVersionIssue: {detected}");
 
                     if detected {
+                        let mut line_number: u32 = 0;
+                        let mut content: &str = &pragma_version;
+
+                        match def {
+                            Loc::File(file, start, _end) => {
+                                match get_issue_line_number(&parsed_file.file_content, start) {
+                                    Some(line) => line_number = line,
+                                    None => {}
+                                }
+
+                                match extract_line_from_content(
+                                    &parsed_file.file_content,
+                                    line_number.try_into().unwrap(),
+                                ) {
+                                    Some(extracted_line) => content = extracted_line,
+                                    None => {}
+                                }
+                            }
+                            _ => {}
+                        }
+
                         let issue_appearance: IssueAppearance = IssueAppearance {
                             file_path: (parsed_file.file_path.clone()),
-                            line: (0),
-                            content: (pragma_version),
+                            line: line_number,
+                            content: content.to_owned(),
                         };
                         self.detected_issues.push(issue_appearance);
                     }
@@ -44,24 +76,25 @@ impl Detector for PragmaVersionDetector {
     fn get_metadata(&self) -> IssueMetadata {
         let metadata: IssueMetadata = IssueMetadata {
             severity: Severities::L,
-            title: r#"Inconsistent floating pragma version"#.to_string(),
+            title: r#"Insecure declaration of pragma version"#.to_string(),
             content: indoc! {
-            "The specified <code>pragma</code> version allows for the utilization of compiler versions
-            beyond <code>0.8.0</code> to compile the source code.
-            However, it's important to consider the potential risks associated with using a floating pragma version.<br>
-
-            Employing versions <code>0.8.7</code>or earlier may result in compilation errors, as they lack support for
-            functions overriding interface functions without using the <code>override</code> modifier, which is exclusively 
-            available in Solidity <code>0.8.8</code> and newer versions. Similarly, the usage of abi.encodeCall, 
-            which was introduced in Solidity <code>0.8.11</code>, may cause issues if the codebase relies on it.<br>
-
-            While it is not confirmed whether these specific bugs related to override or encoding will appear in the code, 
-            it is advised to be cautious. Considering the uncertainty of potential bugs related to 
-            <code>override</code>, <code>encode</code>, or others, it is recommended to avoid using a floating pragma version.<br>
-
-            Consider upgrading the pragma version to a newer release the most recent version available, 
-            in order to mitigate potential risks leveraging from bug fixes introduced on newer releases. 
-            Also, make the pragma version fixed."}.to_string(),
+            "The specified <code>pragma</code> version allows for the utilization of different compiler versions to compile the source code.
+            It's important to consider the potential risks associated with using a floating or flexible pragma version. 
+            For instance, employing versions <code>0.8.7</code> or earlier may result in compilation errors, as they lack support for 
+            functions overriding interface functions without using the <code>override</code> modifier, 
+            which is exclusively available in Solidity <code>0.8.8</code> and newer versions.<br> 
+            
+            Similarly, the usage of <code>abi.encodeCall</code>, which was introduced in Solidity <code>0.8.11</code>, 
+            may cause issues if the codebase relies on it. Although it is uncertain whether these specific bugs related to <code>override</code> 
+            or <code>encode</code> will manifest in the code, exercising caution is advised to avoid potential unexpected scenarios or compatibility
+            issues that may arise with the inclusion of new features or implementations.
+            Considering the uncertainty of potential bugs related to <code>override</code>, <code>encode</code>, or others, using a floating (flexible)
+            <code>pragma</code> version might lead to the project compiling with uncertain versions within that range.<br>
+            
+            Consider upgrading the pragma version to a newer release, preferably the most recent version available, 
+            in order to mitigate potential risks stemming from bug fixes introduced in previous releases. 
+            Additionally, it is recommended to make the pragma version fixed to ensure consistency and stability in the project."}.to_string(),
+            gas_saved_per_instance: 0,
         };
 
         return metadata;
