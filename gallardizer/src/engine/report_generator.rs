@@ -1,5 +1,9 @@
+use indoc::indoc;
+
 use crate::utils::markdown_generator::{AsMarkdown, Markdown};
+use std::cmp::Ordering;
 use std::fs::{self, File};
+use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 
 #[warn(dead_code)]
@@ -50,7 +54,7 @@ pub fn generate_report1() {
     // generate_report_at_dir("out/");
 }
 
-pub fn generate_report_locally(issues: Vec<Issue>) {
+pub fn generate_report_locally(issues: Vec<Issue>, github_link: &str) {
     let report_dir = "./out";
     if let Err(err) = fs::create_dir_all(report_dir) {
         eprintln!("Failed to create report directory: {}", err);
@@ -66,10 +70,11 @@ pub fn generate_report_locally(issues: Vec<Issue>) {
         }
     };
 
-    generate_report(report_file, issues);
+    generate_report(report_file, issues, github_link);
+    remove_auto_generated_backslashes(report_path);
 }
 
-pub fn generate_report_at_dir(dir: &str, issues: Vec<Issue>) {
+pub fn generate_report_at_dir(dir: &str, issues: Vec<Issue>, github_link: &str) {
     let report_path = Path::new(dir).join("report.md");
     report_path.to_string_lossy().into_owned();
 
@@ -81,10 +86,18 @@ pub fn generate_report_at_dir(dir: &str, issues: Vec<Issue>) {
             return;
         }
     };
-    generate_report(report_file, issues);
+    generate_report(report_file, issues, github_link);
+    let full_dir: &str = &format!("{}/report.md", dir);
+    remove_auto_generated_backslashes(full_dir);
 }
-fn generate_report(file: File, issues: Vec<Issue>) {
+
+fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
     let mut md = Markdown::new(file);
+
+    // Sort inner appearances by file and line
+    for mut issue in issues.iter_mut() {
+        sort_appearances_by_file_and_line(&mut issue.issue_appearances);
+    }
 
     // Sort the issues by severity in the desired order
     let mut sorted_issues: Vec<&Issue> = issues.iter().collect();
@@ -120,6 +133,7 @@ fn generate_report(file: File, issues: Vec<Issue>) {
             md.write(severity_header.heading(2)).unwrap();
 
             //  generate_summary_table(&mut md, &severity_issues);
+
             let issues_found: usize = severity_issues.len();
             let mut total_issue_instances: usize = 0;
 
@@ -146,7 +160,6 @@ fn generate_report(file: File, issues: Vec<Issue>) {
             );
 
             md.write(instances_detail.paragraph()).unwrap();
-            md.write("\n\n").unwrap();
         }
     }
 
@@ -177,12 +190,9 @@ fn generate_report(file: File, issues: Vec<Issue>) {
             let mut position_id: u32 = 1;
             for issue in severity_issues {
                 let issue_instances: usize = issue.issue_appearances.len();
-                format_issue(&mut md, issue, &position_id, &issue_instances);
+                format_issue(&mut md, issue, &position_id, &issue_instances, github_link);
                 position_id += 1;
             }
-
-            // Add a newline for readability between severity groups
-            md.write("\n\n").unwrap();
         }
     }
 }
@@ -190,7 +200,13 @@ fn generate_report(file: File, issues: Vec<Issue>) {
 // fn generate_report_summary(md: &Markdown<File>)
 
 // Generate the details for an individual issue
-fn format_issue(md: &mut Markdown<File>, issue: &Issue, position: &u32, times_found: &usize) {
+fn format_issue(
+    md: &mut Markdown<File>,
+    issue: &Issue,
+    position: &u32,
+    times_found: &usize,
+    github_link: &str,
+) {
     let full_header = format!("[{}-{}]", &issue.metadata.severity.to_string(), &position)
         + " "
         + &issue.metadata.title;
@@ -206,13 +222,73 @@ fn format_issue(md: &mut Markdown<File>, issue: &Issue, position: &u32, times_fo
     md.write(times_found_prompt.italic().paragraph()).unwrap();
 
     // Add the code blocks for each occurrence
+    let mut previous_file_path: &String = &mut "".to_string(); // Initialize to empty string
     for appearance in &issue.issue_appearances {
-        md.write(appearance.content.paragraph()).unwrap();
-        md.write("\n").unwrap();
+        let formatted_appearance = format_appearance(
+            appearance,
+            &appearance.file_path,
+            previous_file_path,
+            github_link,
+        );
+        md.write(formatted_appearance.paragraph()).unwrap();
+
+        previous_file_path = &appearance.file_path;
     }
 
-    // Add a newline for readability between issues
-    md.write("\n").unwrap();
+    md.write("```".paragraph()).unwrap();
+    if (github_link != "") {
+        let full_link: &String = &format!("{}blob/main/{}", github_link, previous_file_path);
+        let full_formatted_link = &format!("**Location link:** [{}]({})\n\n", full_link, full_link);
+        md.write(full_formatted_link.paragraph()).unwrap();
+    }
+}
+
+fn sort_appearances_by_file_and_line(instances: &mut Vec<IssueAppearance>) {
+    instances.sort_by(|a, b| {
+        let file_comparison = a.file_path.cmp(&b.file_path);
+        if file_comparison == Ordering::Equal {
+            a.line.cmp(&b.line)
+        } else {
+            file_comparison
+        }
+    });
+}
+
+fn format_appearance(
+    issue_appearance: &IssueAppearance,
+    current_file_path: &str,
+    previous_file_path: &str,
+    github_link: &str,
+) -> String {
+    let mut formatted_appearance: String = "".to_string();
+
+    if (current_file_path != previous_file_path) {
+        // If this is not the first finding, it means that we need to close the previous codeblock
+        if (previous_file_path != "") {
+            formatted_appearance += "```\n";
+
+            // If a Github link to the project was provided, reference that after closing the block.
+            if (github_link != "") {
+                let full_link: &String =
+                    &format!("{}blob/main/{}", github_link, previous_file_path);
+                formatted_appearance +=
+                    &format!("\n**Location link:** [{}]({})\n\n", full_link, full_link);
+            }
+            formatted_appearance += "\n";
+        }
+        formatted_appearance += "```solidity";
+        formatted_appearance += &format!("\nFile: {}\n", issue_appearance.file_path);
+    }
+
+    let line_number_with_content = &format!(
+        "\n{}:    {}",
+        &issue_appearance.line.to_string(),
+        &issue_appearance.content
+    );
+
+    formatted_appearance += line_number_with_content;
+
+    return formatted_appearance;
 }
 
 fn severity_enum_to_title(severity: &Severities) -> String {
@@ -231,6 +307,14 @@ fn times_found_text(times_found: &usize) -> String {
     }
 
     return format!("This issue found {} time:", times_found);
+}
+fn remove_auto_generated_backslashes(file_path: &str) -> io::Result<()> {
+    let file_content = fs::read_to_string(file_path)?;
+
+    let cleared_content = file_content.replace("\\", "");
+
+    fs::write(file_path, cleared_content)?;
+    Ok(())
 }
 
 fn generate_summary_tables(issues: &Vec<Issue>) {}

@@ -8,7 +8,7 @@ pub trait Detector {
     fn get_detected_issues(&self) -> Vec<IssueAppearance>;
 }
 
-pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) {
+pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
     let detectors: Vec<Box<dyn Detector>> = get_all_detectors();
 
     let mut all_detected_issues: Vec<Issue> = Vec::new();
@@ -37,7 +37,8 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) {
         // In here add real-time detection feed.
     }
 
-    generate_report_locally(all_detected_issues);
+    // generate_report_locally(all_detected_issues);
+    return all_detected_issues;
 }
 
 fn get_all_detectors() -> Vec<Box<dyn Detector>> {
