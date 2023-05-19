@@ -1,5 +1,7 @@
 use crate::engine::detectors::Detector;
-use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
+use crate::engine::report_generator::{
+    get_line_content, get_line_number, IssueAppearance, IssueMetadata, Severities,
+};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 use solang_parser::pt::{Base, ContractPart, FunctionAttribute, FunctionTy, Loc, SourceUnitPart};
@@ -73,6 +75,25 @@ impl Detector for ReentrancyModifierPrecedence {
                                         // position 0 will be for the visibility
                                         // position 1 should be nonReentrant
                                         if detected {
+                                            if let Loc::File(_, initial_position, _) = &def.loc {
+                                                let line_number = get_line_number(
+                                                    &parsed_file.file_content,
+                                                    initial_position,
+                                                );
+
+                                                let line_content = get_line_content(
+                                                    &parsed_file.file_content,
+                                                    line_number,
+                                                );
+
+                                                let issue_appearance: IssueAppearance =
+                                                    IssueAppearance {
+                                                        file_path: (parsed_file.file_path.clone()),
+                                                        line: line_number,
+                                                        content: line_content.to_owned(),
+                                                    };
+                                                self.detected_issues.push(issue_appearance);
+                                            }
                                             // println!(
                                             //         "\n\nFunction {:?} has `nonReentrant` modifier and \
                                             //         another modifier before it",

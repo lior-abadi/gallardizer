@@ -51,6 +51,15 @@ fn read_files_with_extension(
 
     let mut file_contents = Vec::new();
     for file_path in files {
+        // Skip paths that contain "node_modules"
+        if file_path.to_string_lossy().contains("node_modules")
+            || file_path.to_string_lossy().contains("lib")
+            || file_path.to_string_lossy().contains("test")
+            || file_path.to_string_lossy().contains("script")
+        {
+            continue;
+        }
+
         let mut file = fs::File::open(&file_path)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
