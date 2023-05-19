@@ -31,7 +31,7 @@ impl Severities {
 #[derive(Debug, Clone)]
 pub struct IssueAppearance {
     pub file_path: String,
-    pub line: u32,
+    pub line: usize,
     pub content: String,
 }
 
@@ -40,7 +40,7 @@ pub struct IssueMetadata {
     pub title: String,
     pub content: String,
     pub severity: Severities,
-    pub gas_saved_per_instance: i64,
+    pub gas_saved_per_instance: u64,
 }
 
 // An issue is composed by several appearances
@@ -71,7 +71,13 @@ pub fn generate_report_locally(issues: Vec<Issue>, github_link: &str) {
     };
 
     generate_report(report_file, issues, github_link);
-    remove_auto_generated_backslashes(report_path);
+    let removing_op = remove_auto_generated_backslashes(report_path);
+    match removing_op {
+        Ok(_removing_op) => {}
+        Err(_error) => {
+            print!("Error: Failed to remove backslashes from file")
+        }
+    }
 }
 
 pub fn generate_report_at_dir(dir: &str, issues: Vec<Issue>, github_link: &str) {
@@ -88,7 +94,14 @@ pub fn generate_report_at_dir(dir: &str, issues: Vec<Issue>, github_link: &str) 
     };
     generate_report(report_file, issues, github_link);
     let full_dir: &str = &format!("{}/report.md", dir);
-    remove_auto_generated_backslashes(full_dir);
+
+    let removing_op = remove_auto_generated_backslashes(full_dir);
+    match removing_op {
+        Ok(_removing_op) => {}
+        Err(_error) => {
+            print!("Error: Failed to remove backslashes from file")
+        }
+    }
 }
 
 fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
@@ -112,7 +125,7 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
     let issue_summary_header = format!("Issues Summary");
     md.write(issue_summary_header.heading(1)).unwrap();
 
-    // Generate the report for each severity group
+    // Generate the report's summary
     for severity in &[
         Severities::H,
         Severities::M,
@@ -128,11 +141,12 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
             .collect();
 
         if !severity_issues.is_empty() {
-            // Add the severity heading
+            // Add each severity heading
             let severity_header = severity_enum_to_title(severity);
             md.write(severity_header.heading(2)).unwrap();
 
-            //  generate_summary_table(&mut md, &severity_issues);
+            // Generate the summary table for each severity
+            generate_summary_table(&mut md, &severity_issues, &severity);
 
             let issues_found: usize = severity_issues.len();
             let mut total_issue_instances: usize = 0;
@@ -141,10 +155,12 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
                 total_issue_instances += issue.issue_appearances.len();
             }
 
-            let instance_word = if (total_issue_instances != 1) {
-                "instances".to_string()
+            let instance_word: String;
+
+            if (total_issue_instances != 1) {
+                instance_word = "instances".to_string();
             } else {
-                "instance".to_string()
+                instance_word = "instance".to_string();
             };
 
             let issue_word = if (issues_found != 1) {
@@ -154,7 +170,7 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
             };
 
             let instances_detail = format!(
-                "Total: {} {instance_word} were found over {} {issue_word}.",
+                "Total: {} {instance_word} over {} {issue_word}",
                 &total_issue_instances.to_string(),
                 &issues_found.to_string()
             );
@@ -182,9 +198,6 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
             // Add the severity heading
             let severity_header = severity_enum_to_title(severity);
             md.write(severity_header.heading(1)).unwrap();
-
-            // Add the summary table
-            //  generate_summary_table(&mut md, &severity_issues);
 
             // Add the findings for each issue
             let mut position_id: u32 = 1;
@@ -237,7 +250,10 @@ fn format_issue(
 
     md.write("```".paragraph()).unwrap();
     if (github_link != "") {
-        let full_link: &String = &format!("{}blob/main/{}", github_link, previous_file_path);
+        let file_path_without_prefix = previous_file_path
+            .strip_prefix("./")
+            .unwrap_or(previous_file_path);
+        let full_link: &String = &format!("{}blob/main/{}", github_link, file_path_without_prefix);
         let full_formatted_link = &format!("**Location link:** [{}]({})\n\n", full_link, full_link);
         md.write(full_formatted_link.paragraph()).unwrap();
     }
@@ -269,8 +285,11 @@ fn format_appearance(
 
             // If a Github link to the project was provided, reference that after closing the block.
             if (github_link != "") {
+                let file_path_without_prefix = previous_file_path
+                    .strip_prefix("./")
+                    .unwrap_or(previous_file_path);
                 let full_link: &String =
-                    &format!("{}blob/main/{}", github_link, previous_file_path);
+                    &format!("{}blob/main/{}", github_link, file_path_without_prefix);
                 formatted_appearance +=
                     &format!("\n**Location link:** [{}]({})\n\n", full_link, full_link);
             }
@@ -317,4 +336,107 @@ fn remove_auto_generated_backslashes(file_path: &str) -> io::Result<()> {
     Ok(())
 }
 
-fn generate_summary_tables(issues: &Vec<Issue>) {}
+fn generate_summary_table(md: &mut Markdown<File>, issues: &Vec<&Issue>, severity: &Severities) {
+    // We want to different types: only for Gas add a new column with the amount saved.
+    let header_with_placeholder: &str;
+
+    if (severity != &Severities::Gas) {
+        header_with_placeholder = "| |Issue|Instances|\n|-|:-|:-:|";
+        let mut position_id: u32 = 1;
+
+        let mut rows: String = "".to_string();
+
+        for issue in issues {
+            let issue_instances: usize = issue.issue_appearances.len();
+            let finding_indicator = format!(
+                "[{}-{}]",
+                &issue.metadata.severity.to_string(),
+                &position_id
+            );
+
+            let current_full_row: String = format!(
+                "| {} | {} | {} |\n",
+                finding_indicator, issue.metadata.title, issue_instances
+            );
+            rows += &current_full_row;
+            position_id += 1;
+        }
+
+        let table = format!("{}\n{}", header_with_placeholder, rows);
+        md.write(table.as_str()).unwrap();
+    } else {
+        header_with_placeholder = "| |Issue|Instances|Total Gas Saved|\n|-|:-|:-:|:-:|";
+        let mut position_id: u32 = 1;
+
+        let mut rows: String = "".to_string();
+
+        for issue in issues {
+            let issue_instances: u64 = issue.issue_appearances.len().try_into().unwrap();
+            let finding_indicator = format!(
+                "[{}-{}]",
+                &issue.metadata.severity.to_string(),
+                &position_id
+            );
+
+            let current_full_row: String = format!(
+                "| {} | {} | {} | {} |\n",
+                finding_indicator,
+                issue.metadata.title,
+                issue_instances,
+                issue.metadata.gas_saved_per_instance * &issue_instances
+            );
+            rows += &current_full_row;
+            position_id += 1;
+        }
+
+        let table = format!("{}\n{}", header_with_placeholder, rows);
+        md.write(table.as_str()).unwrap();
+    };
+}
+
+pub fn get_line_content(content: &str, line_number: usize) -> &str {
+    let mut current_line_number = 1;
+    let mut line_start = 0;
+
+    for (byte_index, byte) in content.bytes().enumerate() {
+        if byte == b'\n' {
+            if current_line_number == line_number {
+                return &content[line_start..byte_index];
+            }
+
+            current_line_number += 1;
+            line_start = byte_index + 1;
+        }
+    }
+
+    // Check if the desired line is the last line
+    if current_line_number == line_number {
+        return &content[line_start..];
+    } else {
+        return "";
+    }
+}
+
+pub fn get_line_number(content: &str, position: &usize) -> usize {
+    let mut line_count = 0;
+    let mut bytes_count = 0;
+
+    for (_byte_index, byte) in content.bytes().enumerate() {
+        if byte == b'\n' {
+            line_count += 1;
+        }
+
+        bytes_count += 1;
+
+        if &bytes_count >= position {
+            break;
+        }
+    }
+    line_count += 1;
+    println!(
+        "Number of line breaks up to position {}: {}",
+        position, line_count
+    );
+
+    return line_count;
+}

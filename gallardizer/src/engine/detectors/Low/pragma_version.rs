@@ -1,6 +1,7 @@
-use super::Detector;
-use crate::engine::detectors::{extract_line_from_content, get_issue_line_number};
-use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
+use crate::engine::detectors::Detector;
+use crate::engine::report_generator::{
+    get_line_content, get_line_number, IssueAppearance, IssueMetadata, Severities,
+};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 use solang_parser::pt::{Loc, SourceUnitPart};
@@ -19,45 +20,21 @@ impl Detector for PragmaVersionDetector {
                     let detected: bool = check_floating_pragma(&pragma_version)
                         || check_pragma_version(&pragma_version);
 
-                    // println!("{:?}", def);
-                    // println!(" ");
-
-                    // println!("{:?}", _opt);
-                    // println!(" ");
-
-                    // println!("{:?}", _opt_lit);
-                    // println!(" ");
-
-                    println!("{pragma_version} - PragmaVersionIssue: {detected}");
-
                     if detected {
-                        let mut line_number: u32 = 0;
-                        let mut content: &str = &pragma_version;
+                        if let Loc::File(_, initial_position, _) = def {
+                            let line_number =
+                                get_line_number(&parsed_file.file_content, initial_position);
 
-                        match def {
-                            Loc::File(file, start, _end) => {
-                                match get_issue_line_number(&parsed_file.file_content, start) {
-                                    Some(line) => line_number = line,
-                                    None => {}
-                                }
+                            let line_content =
+                                get_line_content(&parsed_file.file_content, line_number);
 
-                                match extract_line_from_content(
-                                    &parsed_file.file_content,
-                                    line_number.try_into().unwrap(),
-                                ) {
-                                    Some(extracted_line) => content = extracted_line,
-                                    None => {}
-                                }
-                            }
-                            _ => {}
+                            let issue_appearance: IssueAppearance = IssueAppearance {
+                                file_path: (parsed_file.file_path.clone()),
+                                line: line_number,
+                                content: line_content.to_owned(),
+                            };
+                            self.detected_issues.push(issue_appearance);
                         }
-
-                        let issue_appearance: IssueAppearance = IssueAppearance {
-                            file_path: (parsed_file.file_path.clone()),
-                            line: line_number,
-                            content: content.to_owned(),
-                        };
-                        self.detected_issues.push(issue_appearance);
                     }
                 }
                 _ => (),
