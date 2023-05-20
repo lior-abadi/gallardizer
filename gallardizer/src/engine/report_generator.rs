@@ -1,9 +1,7 @@
-use indoc::indoc;
-
 use crate::utils::markdown_generator::{AsMarkdown, Markdown};
 use std::cmp::Ordering;
 use std::fs::{self, File};
-use std::io::{self, BufRead, BufReader};
+use std::io::{self};
 use std::path::Path;
 
 #[warn(dead_code)]
@@ -29,10 +27,15 @@ impl Severities {
 }
 
 #[derive(Debug, Clone)]
-pub struct IssueAppearance {
-    pub file_path: String,
+pub struct AppearanceMetadata {
     pub line: usize,
     pub content: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct IssueAppearance {
+    pub file_path: String,
+    pub metadata: Vec<AppearanceMetadata>,
 }
 
 #[derive(Debug, Clone)]
@@ -259,11 +262,12 @@ fn format_issue(
     }
 }
 
+// Sorts all appearances using the first one as reference
 fn sort_appearances_by_file_and_line(instances: &mut Vec<IssueAppearance>) {
     instances.sort_by(|a, b| {
         let file_comparison = a.file_path.cmp(&b.file_path);
         if file_comparison == Ordering::Equal {
-            a.line.cmp(&b.line)
+            a.metadata[0].line.cmp(&b.metadata[0].line)
         } else {
             file_comparison
         }
@@ -299,13 +303,14 @@ fn format_appearance(
         formatted_appearance += &format!("\nFile: {}\n", issue_appearance.file_path);
     }
 
-    let line_number_with_content = &format!(
-        "\n{}:    {}",
-        &issue_appearance.line.to_string(),
-        &issue_appearance.content
-    );
-
-    formatted_appearance += line_number_with_content;
+    for line_of_code in &issue_appearance.metadata {
+        let line_number_with_content = &format!(
+            "\n{}:    {}",
+            &line_of_code.line.to_string(),
+            &line_of_code.content
+        );
+        formatted_appearance += line_number_with_content;
+    }
 
     return formatted_appearance;
 }
@@ -417,26 +422,43 @@ pub fn get_line_content(content: &str, line_number: usize) -> &str {
     }
 }
 
-pub fn get_line_number(content: &str, position: &usize) -> usize {
+pub fn get_line_number(
+    content: &str,
+    initial_position: &usize,
+    final_position: &usize,
+) -> Vec<usize> {
     let mut line_count = 0;
     let mut bytes_count = 0;
+    let mut line_numbers: Vec<usize> = Vec::new();
+    let mut current_line_number = 1;
 
     for (_byte_index, byte) in content.bytes().enumerate() {
         if byte == b'\n' {
             line_count += 1;
+
+            if &bytes_count >= initial_position && &bytes_count < final_position {
+                line_numbers.push(current_line_number);
+            }
+
+            current_line_number += 1;
         }
 
         bytes_count += 1;
 
-        if &bytes_count >= position {
+        if &bytes_count >= final_position {
             break;
         }
     }
-    line_count += 1;
-    println!(
-        "Number of line breaks up to position {}: {}",
-        position, line_count
-    );
 
-    return line_count;
+    // Check if the desired line is the last line
+    if &bytes_count >= initial_position && current_line_number == line_count + 1 {
+        line_numbers.push(current_line_number);
+    }
+
+    // println!(
+    //     "Line numbers between the offset [{}:{}] = {:?}",
+    //     initial_position, final_position, line_numbers
+    // );
+
+    return line_numbers;
 }
