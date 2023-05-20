@@ -42,7 +42,7 @@ impl Detector for PragmaVersionDetector {
             content: indoc! {
             " The utilization of a flexible pragma version could introduce a variety of potential risks to your contract, 
             accommodating a range of compiler versions which may lack support for specific improvements and changes such as 
-            those found in <code>0.8.8</code>'s <code>override</code> modifier or <code> 0.8.11</code>'s <code>abi.encodeCall</code>.<br>
+            those found in <code>0.8.8</code>'s <code>override</code> modifier or <code>0.8.11</code>'s <code>abi.encodeCall</code>.<br>
 
             Without singling out these features as definitive concerns, it's important to acknowledge the broad 
             spectrum of unexpected complications that could occur. A recommendation would be to align with a fixed, 
