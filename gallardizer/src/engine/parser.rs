@@ -1,14 +1,11 @@
 use crate::utils::file_processor::FileNameWithContent;
-use solang_parser::{
-    parse,
-    pt::{ContractPart, SourceUnit, SourceUnitPart},
-};
+use solang_parser::parse;
 
 pub fn parse_targets(targets: Vec<FileNameWithContent>) -> Vec<FileNameWithContent> {
     let mut parsed_files: Vec<FileNameWithContent> = Vec::new();
     for mut target in targets {
         let literal_target: String = format!(r#"{}"#, target.file_content);
-        let (tree, comments) = parse(literal_target.as_str(), 0).unwrap();
+        let (tree, _comments) = parse(literal_target.as_str(), 0).unwrap();
 
         target.parsed_ast_tree = tree;
         parsed_files.push(target);

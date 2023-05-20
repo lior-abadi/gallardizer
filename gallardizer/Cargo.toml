@@ -3,9 +3,13 @@ name = "gallardizer"
 version = "0.1.0"
 edition = "2021"
 
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "4.3.0", features = ["cargo"] }
+indoc = "2.0.1"
+regex = "1.8.1"
 solang-parser = "0.2.4"
 walkdir = "2.3.3"
 
