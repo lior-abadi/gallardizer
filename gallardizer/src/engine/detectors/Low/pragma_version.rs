@@ -1,10 +1,8 @@
-use crate::engine::detectors::Detector;
-use crate::engine::report_generator::{
-    get_line_content, get_line_number, IssueAppearance, IssueMetadata, Severities,
-};
+use crate::engine::detectors::{get_appearance_metadata, Detector};
+use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
-use solang_parser::pt::{Loc, SourceUnitPart};
+use solang_parser::pt::SourceUnitPart;
 
 pub struct PragmaVersionDetector {
     pub detected_issues: Vec<IssueAppearance>,
@@ -14,27 +12,15 @@ impl Detector for PragmaVersionDetector {
     fn run_detector(&mut self, parsed_file: &FileNameWithContent) {
         for part in &parsed_file.parsed_ast_tree.0 {
             match part {
-                SourceUnitPart::PragmaDirective(def, _opt, _opt_lit) => {
+                SourceUnitPart::PragmaDirective(loc, _opt, _opt_lit) => {
                     let pragma_version = _opt_lit.as_ref().map(|s| s.string.clone()).unwrap();
 
                     let detected: bool = check_floating_pragma(&pragma_version)
                         || check_pragma_version(&pragma_version);
 
                     if detected {
-                        if let Loc::File(_, initial_position, _) = def {
-                            let line_number =
-                                get_line_number(&parsed_file.file_content, initial_position);
-
-                            let line_content =
-                                get_line_content(&parsed_file.file_content, line_number);
-
-                            let issue_appearance: IssueAppearance = IssueAppearance {
-                                file_path: (parsed_file.file_path.clone()),
-                                line: line_number,
-                                content: line_content.to_owned(),
-                            };
-                            self.detected_issues.push(issue_appearance);
-                        }
+                        let issue_appearance = get_appearance_metadata(loc, parsed_file);
+                        self.detected_issues.push(issue_appearance);
                     }
                 }
                 _ => (),
@@ -49,28 +35,20 @@ impl Detector for PragmaVersionDetector {
     fn get_detector_name(&self) -> String {
         return "PragmaVersion".to_string();
     }
-
     fn get_metadata(&self) -> IssueMetadata {
         let metadata: IssueMetadata = IssueMetadata {
             severity: Severities::L,
-            title: r#"Insecure declaration of pragma version"#.to_string(),
+            title: indoc! {"Insecure declaration of <code>pragma</code> version"}.to_string(),
             content: indoc! {
-            "The specified <code>pragma</code> version allows for the utilization of different compiler versions to compile the source code.
-            It's important to consider the potential risks associated with using a floating or flexible pragma version. 
-            For instance, employing versions <code>0.8.7</code> or earlier may result in compilation errors, as they lack support for 
-            functions overriding interface functions without using the <code>override</code> modifier, 
-            which is exclusively available in Solidity <code>0.8.8</code> and newer versions.<br> 
-            
-            Similarly, the usage of <code>abi.encodeCall</code>, which was introduced in Solidity <code>0.8.11</code>, 
-            may cause issues if the codebase relies on it. Although it is uncertain whether these specific bugs related to <code>override</code> 
-            or <code>encode</code> will manifest in the code, exercising caution is advised to avoid potential unexpected scenarios or compatibility
-            issues that may arise with the inclusion of new features or implementations.
-            Considering the uncertainty of potential bugs related to <code>override</code>, <code>encode</code>, or others, using a floating (flexible)
-            <code>pragma</code> version might lead to the project compiling with uncertain versions within that range.<br>
-            
-            Consider upgrading the pragma version to a newer release, preferably the most recent version available, 
-            in order to mitigate potential risks stemming from bug fixes introduced in previous releases. 
-            Additionally, it is recommended to make the pragma version fixed to ensure consistency and stability in the project."}.to_string(),
+            " The utilization of a flexible pragma version could introduce a variety of potential risks to your contract, 
+            accommodating a range of compiler versions which may lack support for specific improvements and changes such as 
+            those found in <code>0.8.8</code>'s <code>override</code> modifier or <code> 0.8.11</code>'s <code>abi.encodeCall</code>.<br>
+
+            Without singling out these features as definitive concerns, it's important to acknowledge the broad 
+            spectrum of unexpected complications that could occur. A recommendation would be to align with a fixed, 
+            updated pragma version, providing a defense against potential compatibility issues that are tied to evolving 
+            language specifications and reducing exposure to bugs fixed in recent compiler versions, all of which contributes 
+            to a more stable project."}.to_string(),
             gas_saved_per_instance: 0,
         };
 

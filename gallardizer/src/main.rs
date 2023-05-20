@@ -4,10 +4,9 @@ mod utils;
 use engine::gallardizer_engine as gallardizer;
 use utils::file_processor;
 
+// ==================================== ORIGINAL SCRIPT ===============================================
 fn main() {
     run_detectors();
-
-    // solc_parser::parse_target();
 }
 
 fn run_detectors() {
@@ -24,3 +23,12 @@ fn run_detectors() {
         "https://github.com/code-423n4/2023-05-ajna/",
     );
 }
+
+// ==================================== SANDBOX SCRIPT ===============================================
+
+// use clap::{arg, command, value_parser, ArgAction, Command};
+// use std::path::PathBuf;
+// use std::path::PathBuf;
+// use walkdir::{DirEntry, WalkDir};
+
+// fn main() {}

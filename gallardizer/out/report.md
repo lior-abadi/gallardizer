@@ -2,7 +2,7 @@
 ## Low Risk Issues
 | |Issue|Instances|
 |-|:-|:-:|
-| [L-1] | Insecure declaration of pragma version | 2 |
+| [L-1] | Insecure declaration of <code>pragma</code> version | 2 |
 
 
 Total: 2 instances over 1 issue
@@ -10,29 +10,23 @@ Total: 2 instances over 1 issue
 ## Non-Critical Issues
 | |Issue|Instances|
 |-|:-|:-:|
-| [NC-1] | The <code>nonReentrant</code> modifier should precede all other modifiers | 31 |
+| [NC-1] | The <code>nonReentrant</code> modifier should precede all other modifiers | 1 |
+| [NC-2] | Prefer scientific notation over exponentiation | 9 |
 
 
-Total: 31 instances over 1 issue
+Total: 10 instances over 2 issues
 
 # Low Risk Issues
-## [L-1] Insecure declaration of pragma version
-The specified <code>pragma</code> version allows for the utilization of different compiler versions to compile the source code.
-It's important to consider the potential risks associated with using a floating or flexible pragma version. 
-For instance, employing versions <code>0.8.7</code> or earlier may result in compilation errors, as they lack support for 
-functions overriding interface functions without using the <code>override</code> modifier, 
-which is exclusively available in Solidity <code>0.8.8</code> and newer versions.<br> 
+## [L-1] Insecure declaration of <code>pragma</code> version
+ The utilization of a flexible pragma version could introduce a variety of potential risks to your contract, 
+accommodating a range of compiler versions which may lack support for specific improvements and changes such as 
+those found in <code>0.8.8</code>'s <code>override</code> modifier or <code> 0.8.11</code>'s <code>abi.encodeCall</code>.<br>
 
-Similarly, the usage of <code>abi.encodeCall</code>, which was introduced in Solidity <code>0.8.11</code>, 
-may cause issues if the codebase relies on it. Although it is uncertain whether these specific bugs related to <code>override</code> 
-or <code>encode</code> will manifest in the code, exercising caution is advised to avoid potential unexpected scenarios or compatibility
-issues that may arise with the inclusion of new features or implementations.
-Considering the uncertainty of potential bugs related to <code>override</code>, <code>encode</code>, or others, using a floating (flexible)
-<code>pragma</code> version might lead to the project compiling with uncertain versions within that range.<br>
-
-Consider upgrading the pragma version to a newer release, preferably the most recent version available, 
-in order to mitigate potential risks stemming from bug fixes introduced in previous releases. 
-Additionally, it is recommended to make the pragma version fixed to ensure consistency and stability in the project.
+Without singling out these features as definitive concerns, it's important to acknowledge the broad 
+spectrum of unexpected complications that could occur. A recommendation would be to align with a fixed, 
+updated pragma version, providing a defense against potential compatibility issues that are tied to evolving 
+language specifications and reducing exposure to bugs fixed in recent compiler versions, all of which contributes 
+to a more stable project.
 
 *This issue was found 2 times:*
 
@@ -62,134 +56,77 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 Prioritizing reentrancy checks before any other calculations or validations within modifiers 
 is a recommended practice for enhancing the security of the protected function.
 
-*This issue was found 31 times:*
-
-```solidity
-File: ./ajna-core/src/ERC20Pool.sol
-
-131:        function drawDebt(
-
-
-205:        function repayDebt(
-
-
-281:        function addCollateral(
-
-
-314:        function removeCollateral(
-
-
-354:        function settle(
-
-
-385:        function take(
-
-
-434:        function bucketTake(
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol)
-
-
-```solidity
-File: ./ajna-core/src/ERC721Pool.sol
-
-139:        function drawDebt(
-
-
-214:        function repayDebt(
-
-
-288:        function addCollateral(
-
-
-319:        function mergeOrRemoveCollateral(
-
-
-360:        function removeCollateral(
-
-
-432:        function take(
-
-
-487:        function bucketTake(
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
-
+*This issue found 1 time:*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
 
-227:        function mint(
-
-
 262:        function moveLiquidity(
+263:            MoveLiquidityParams calldata params_
+264:        ) external override mayInteract(params_.pool, params_.tokenId) nonReentrant {
 
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
 
 
-```solidity
-File: ./ajna-core/src/base/FlashloanablePool.sol
 
-28:        function flashLoan(
+## [NC-2] Prefer scientific notation over exponentiation
+Although the compiler effectively optimizes the use of exponentiation, 
+it's generally more advisable to employ scientific notation for representing large numbers. 
+By opting for idioms like <code>1e18</code> instead of <code>10**18</code>, you're using a method that
+inherently does not require additional compiler optimization.<br>
+ 
+This practice promotes clarity and efficiency in your code, aligning with robust coding standards.
+
+*This issue was found 9 times:*
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
+
+102:                minDebtAmount_ = Maths.wdiv(Maths.wdiv(debt_, Maths.wad(loansCount_)), 10**19);
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/FlashloanablePool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/FlashloanablePool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
 
 
 ```solidity
-File: ./ajna-core/src/base/Pool.sol
+File: ./ajna-core/src/libraries/internal/Maths.sol
 
-170:        function addQuoteToken(uint256 amount_, uint256 index_, uint256 expiry_)
-
-
-194:        function moveQuoteToken(uint256 maxAmount_, uint256 fromIndex_, uint256 toIndex_, uint256 expiry_)
+42:            return (x * y + 10**27 / 2) / 10**27;
 
 
-223:        function removeQuoteToken(uint256 maxAmount_, uint256 index_)
+46:            z = n % 2 != 0 ? x : 10**27;
 
 
-251:        function updateInterest() external override nonReentrant {
-
-
-267:        function stampLoan() external override nonReentrant {
-
-
-291:        function kick(address borrower_, uint256 npLimitIndex_) external override nonReentrant {
-
-
-325:        function kickWithDeposit(uint256 index_, uint256 npLimitIndex_) external override nonReentrant {
-
-
-362:        function withdrawBonds(address recipient_, uint256 maxAmount_) external override nonReentrant {
-
-
-401:        function kickReserveAuction() external override nonReentrant {
-
-
-424:        function takeReserves(uint256 maxAmount_) external override nonReentrant returns (uint256 amount_) {
-
-
-448:        function increaseLPAllowance(address spender_, uint256[] calldata indexes_, uint256[] calldata amounts_)
-
-
-457:        function decreaseLPAllowance(address spender_, uint256[] calldata indexes_, uint256[] calldata amounts_)
-
-
-466:        function revokeLPAllowance(address spender_, uint256[] calldata indexes_) external override nonReentrant {
-
-
-481:        function transferLP(address owner_, address newOwner_, uint256[] calldata indexes_)
+58:            return (x + 10**9 / 2) / 10**9;
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/libraries/Maths.sol
+
+6:        uint256 public constant WAD = 10**18;
+
+
+30:            z = z * 10**9;
+
+
+34:            return (x * y + 10**18 / 2) / 10**18;
+
+
+38:            return (x * 10**18 + y / 2) / y;
+
+
+47:            z = n % 2 != 0 ? x : 10**18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
 
 
 

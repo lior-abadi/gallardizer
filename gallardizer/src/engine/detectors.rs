@@ -1,7 +1,16 @@
-use self::{Low::pragma_version, NonCritical::reentrancy_modifier_precedence};
+use std::fs::Metadata;
 
-use super::report_generator::{generate_report_locally, Issue, IssueAppearance, IssueMetadata};
+use self::{
+    Low::pragma_version,
+    NonCritical::{reentrancy_modifier_precedence, scientific_notation},
+};
+
+use super::report_generator::{
+    generate_report_locally, get_line_content, get_line_number, AppearanceMetadata, Issue,
+    IssueAppearance, IssueMetadata,
+};
 use crate::utils::file_processor::FileNameWithContent;
+use solang_parser::pt::Loc;
 
 pub trait Detector {
     fn run_detector(&mut self, parsed_file: &FileNameWithContent);
@@ -20,6 +29,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
                 detected_issues: Vec::new(),
             },
         ),
+        Box::new(scientific_notation::ScientificNotation {
+            detected_issues: Vec::new(),
+        }),
         /* Add more detector modules */
     ];
 }
@@ -57,6 +69,35 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
     }
 
     return all_detected_issues;
+}
+
+pub fn get_appearance_metadata(loc: &Loc, parsed_file: &FileNameWithContent) -> IssueAppearance {
+    let mut issue_appearance = IssueAppearance {
+        file_path: String::new(),
+        metadata: vec![],
+    };
+
+    if let Loc::File(_, initial_position, final_position) = loc {
+        let line_number =
+            get_line_number(&parsed_file.file_content, initial_position, final_position);
+
+        let mut metadata: Vec<AppearanceMetadata> = vec![];
+        for line in line_number {
+            let line_content = get_line_content(&parsed_file.file_content, line);
+
+            metadata.push(AppearanceMetadata {
+                line: (line),
+                content: (line_content.to_owned()),
+            })
+        }
+
+        issue_appearance = IssueAppearance {
+            file_path: parsed_file.file_path.clone(),
+            metadata,
+        };
+    }
+
+    return issue_appearance;
 }
 
 pub mod Gas;

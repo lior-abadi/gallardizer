@@ -1,11 +1,8 @@
-use crate::engine::detectors::Detector;
-use crate::engine::report_generator::{
-    get_line_content, get_line_number, IssueAppearance, IssueMetadata, Severities,
-};
+use crate::engine::detectors::{get_appearance_metadata, Detector};
+use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
-use solang_parser::pt::{Base, ContractPart, FunctionAttribute, FunctionTy, Loc, SourceUnitPart};
-use std::any::type_name;
+use solang_parser::pt::{ContractPart, FunctionAttribute, FunctionTy, SourceUnitPart};
 
 pub struct ReentrancyModifierPrecedence {
     pub detected_issues: Vec<IssueAppearance>,
@@ -23,94 +20,34 @@ impl Detector for ReentrancyModifierPrecedence {
                                 if def.ty == FunctionTy::Function {
                                     let attributes = &def.attributes;
 
-                                    // Check if the function has the `nonReentrant` modifier
-                                    if attributes.iter().any(|attr| match attr {
-                                        FunctionAttribute::BaseOrModifier(_, base) => {
-                                            base.name.to_string() == "nonReentrant"
-                                        }
-                                        _ => false,
-                                    }) {
-                                        // Check if there is another modifier before `nonReentrant`
-                                        let found_non_reentrant =
-                                            attributes.iter().any(|attr| match attr {
+                                    let mut detected: bool = false;
+                                    for (index, attribute) in attributes.iter().enumerate() {
+                                        if match attribute {
+                                            FunctionAttribute::BaseOrModifier(_, base) => {
+                                                base.name.to_string() == "nonReentrant"
+                                            }
+                                            _ => false,
+                                        } {
+                                            if index == 0 {
+                                                break;
+                                            };
+
+                                            let prev_attribute = &attributes[index - 1];
+                                            if match prev_attribute {
                                                 FunctionAttribute::BaseOrModifier(_, base) => {
-                                                    base.name.to_string() == "nonReentrant"
+                                                    base.name.to_string().len() != 0
                                                 }
                                                 _ => false,
-                                            });
-
-                                        let mut non_reentrant_index: u8 = 0;
-                                        let mut current_index: u8 = 0;
-
-                                        let mut attribute_zero = &def.attributes[0];
-
-                                        for attribute in &def.attributes {
-                                            match attribute {
-                                                FunctionAttribute::BaseOrModifier(_, base) => {
-                                                    if (base.name.to_string() == "nonReentrant") {
-                                                        non_reentrant_index = current_index;
-                                                    }
-                                                }
-                                                _ => (),
-                                            }
-                                            current_index += 1;
-                                        }
-
-                                        let mut detected: bool = false;
-                                        // If the index is greater than zero
-                                        // and the previous element has the BaseOrModifier type, treat this as detected
-                                        if current_index > 0 {
-                                            if let FunctionAttribute::BaseOrModifier(_, base) =
-                                                &def.attributes[(current_index - 1) as usize]
-                                            {
-                                                if let Base { .. } = base {
-                                                    detected = true;
-                                                }
+                                            } {
+                                                detected = true;
                                             }
                                         }
+                                    }
 
-                                        // print!("\n{:?} {:?}\n", detected, current_index);
-
-                                        // Means that the function has more than one modifier before "nonReentrant"
-                                        // position 0 will be for the visibility
-                                        // position 1 should be nonReentrant
-                                        if detected {
-                                            if let Loc::File(_, initial_position, _) = &def.loc {
-                                                let line_number = get_line_number(
-                                                    &parsed_file.file_content,
-                                                    initial_position,
-                                                );
-
-                                                let line_content = get_line_content(
-                                                    &parsed_file.file_content,
-                                                    line_number,
-                                                );
-
-                                                let issue_appearance: IssueAppearance =
-                                                    IssueAppearance {
-                                                        file_path: (parsed_file.file_path.clone()),
-                                                        line: line_number,
-                                                        content: line_content.to_owned(),
-                                                    };
-                                                self.detected_issues.push(issue_appearance);
-                                            }
-                                            // println!(
-                                            //         "\n\nFunction {:?} has `nonReentrant` modifier and \
-                                            //         another modifier before it",
-                                            //         &def,
-                                            //     );
-
-                                            // let extracted_metadata =
-                                            //     extract_line_from_content(&parsed_file, &def.loc);
-
-                                            // let issue_appearance: IssueAppearance =
-                                            //     IssueAppearance {
-                                            //         file_path: (parsed_file.file_path.clone()),
-                                            //         line: extracted_metadata.line,
-                                            //         content: extracted_metadata.content.to_owned(),
-                                            //     };
-                                            // self.detected_issues.push(issue_appearance);
-                                        }
+                                    if detected {
+                                        let issue_appearance =
+                                            get_appearance_metadata(&def.loc, parsed_file);
+                                        self.detected_issues.push(issue_appearance);
                                     }
                                 }
                             }
