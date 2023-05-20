@@ -16,7 +16,7 @@ impl Detector for ScientificNotation {
         let lines: Vec<&str> = file_content.lines().collect();
 
         let mut byte_offset = 0;
-        let pattern = Regex::new(r"10\*\*[+-]?\d+(.\d+)?").unwrap(); // 10**number
+        let pattern = Regex::new(r"10\*\*\d+\b").unwrap(); // 10**constant
 
         // Iterate over each line in the file content
         for (_index, line) in lines.iter().enumerate() {
@@ -30,16 +30,17 @@ impl Detector for ScientificNotation {
                 continue;
             }
 
-            // Search for the ** pattern in the line
-            if let Some(start) = line.find("**") {
-                let byte_start = byte_offset + start;
-                let byte_end = byte_start + 2; // Assuming ** is always two characters
+            // Search for the 10**constant pattern in the line
+            if pattern.is_match(line) {
+                if let Some(start) = line.find("10**") {
+                    let byte_start = byte_offset + start;
+                    let byte_end = byte_start + 4; // Assuming "10**" is always four characters
 
-                let loc = Loc::File(0, byte_start, byte_end);
-                let issue_appearance = get_appearance_metadata(&loc, parsed_file);
-                self.detected_issues.push(issue_appearance);
+                    let loc = Loc::File(0, byte_start, byte_end);
+                    let issue_appearance = get_appearance_metadata(&loc, parsed_file);
+                    self.detected_issues.push(issue_appearance);
+                }
             }
-
             // Update the byte offset for the next line
             byte_offset += line.len() + 1; // Add 1 for the newline character
         }
