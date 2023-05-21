@@ -1,5 +1,6 @@
 use self::{
     Low::{loss_of_precision, pragma_version},
+    Med::safe_mint_erc721,
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
 
@@ -32,6 +33,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(loss_of_precision::LossOfPrecision {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(safe_mint_erc721::SafeMintERC721 {
             detected_issues: Vec::new(),
         }),
         /* Add more detector modules */
