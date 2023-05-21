@@ -129,6 +129,9 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
     md.write(issue_summary_header.heading(1)).unwrap();
 
     // Generate the report's summary
+    let mut global_instance_amount: usize = 0;
+    let mut global_issue_amount: usize = 0;
+
     for severity in &[
         Severities::H,
         Severities::M,
@@ -179,8 +182,18 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
             );
 
             md.write(instances_detail.paragraph()).unwrap();
+            global_instance_amount += &total_issue_instances;
+            global_issue_amount += &issues_found;
         }
     }
+
+    md.write("Overall Results".heading(2)).unwrap();
+    let global_detail = format!(
+        "Total: {} instances over {} issues",
+        &global_instance_amount.to_string(),
+        &global_issue_amount.to_string()
+    );
+    md.write(global_detail.bold().paragraph()).unwrap();
 
     // Generate the report for each severity group
     for severity in &[

@@ -35,6 +35,9 @@ Total: 10 instances over 2 issues
 
 Total: 7 instances over 1 issue
 
+## Overall Results
+**Total: 36 instances over 8 issues**
+
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
 It's recommended to prioritize the use of <code>_safeMint()</code> over <code>_mint()</code> to reduce risk of halting or reverting at early stages of a function call.
