@@ -64,8 +64,6 @@ fn read_files_with_extension(
             continue;
         }
 
-        println!("{:?}", file_path);
-
         let mut file = fs::File::open(&file_path)?;
         let mut contents: String = String::new();
         file.read_to_string(&mut contents)?;

@@ -13,8 +13,15 @@ contract HelloWorld {
         _;
     }
 
-    function SetGreet(string memory _greet) public someModifier nonReentrant {
-        greet = _greet;
+    // function SetGreet(string memory _greet) public someModifier nonReentrant {
+    //     greet = _greet;
+    // }
+
+    function calculate(uint256 number) public returns (uint256) {
+        uint256 num2 = number / 354;
+        uint256 num3 = number / 2e18;
+
+        return num2 / 1e18;
     }
 
     // some comment **
@@ -23,16 +30,16 @@ contract HelloWorld {
      *
      *
      */
-    function SetGreet2(string memory _greet, uint256 _greet1, uint256 _greet2, uint256 _greet3, uint256 _greet4)
-        public
-        nonReentrant
-        someModifier
-    {
-        require(_greet2 == _greet1);
-        require(_greet3 == _greet1, "greet3 is not greet1");
-        uint256 newNumb = _greet1 / _greet2;
-        uint256 newNumb2 = _greet1 ** _greet2;
+    // function SetGreet2(string memory _greet, uint256 _greet1, uint256 _greet2, uint256 _greet3, uint256 _greet4)
+    //     public
+    //     nonReentrant
+    //     someModifier
+    // {
+    //     require(_greet2 == _greet1);
+    //     require(_greet3 == _greet1, "greet3 is not greet1");
+    //     uint256 newNumb = _greet1 / _greet2;
+    //     uint256 newNumb2 = _greet1 ** _greet2;
 
-        greet = _greet;
-    }
+    //     greet = _greet;
+    // }
 }

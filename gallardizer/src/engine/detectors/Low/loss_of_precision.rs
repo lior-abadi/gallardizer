@@ -1,48 +1,44 @@
 use crate::engine::detectors::{get_appearance_metadata, Detector};
+use crate::engine::parser::{extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
-
-use regex::Regex;
-use solang_parser::pt::Loc;
+use solang_parser::pt::Expression;
 
 pub struct LossOfPrecision {
     pub detected_issues: Vec<IssueAppearance>,
 }
-
 impl Detector for LossOfPrecision {
     fn run_detector(&mut self, parsed_file: &FileNameWithContent) {
-        let file_content = &parsed_file.file_content;
-        let lines: Vec<&str> = file_content.lines().collect();
+        let target_nodes =
+            extract_target_from_node(Target::Divide, parsed_file.parsed_ast_tree.clone().into());
 
-        let mut byte_offset = 0;
-        let pattern = Regex::new(r"10\*\*\d+\b").unwrap(); // 10**constant
+        for node in target_nodes {
+            let expression = node.expression().unwrap();
 
-        // Iterate over each line in the file content
-        for (_index, line) in lines.iter().enumerate() {
-            // Skip the lines starting with //, ///, /**, or *
-            if line.trim().starts_with("//")
-                || line.trim().starts_with("///")
-                || line.trim().starts_with("/**")
-                || line.trim().starts_with("*")
-            {
-                byte_offset += line.len() + 1; // Add 1 for the newline character
-                continue;
+            match expression {
+                Expression::Divide(loc, _numerator, nominator) => match *nominator {
+                    Expression::NumberLiteral(_, base, exp, _) => {
+                        let mut exp_value: u32 = 0;
+                        let mut base_value: u128 = 0;
+                        let base_ten: u128 = 10;
+
+                        if exp.len() > 0 {
+                            exp_value = exp.parse::<u32>().unwrap();
+                        }
+
+                        base_value = base.parse::<u128>().unwrap();
+                        let numerator_value = base_value * base_ten.pow(exp_value);
+
+                        if (numerator_value > base_ten.pow(4)) {
+                            let issue_appearance = get_appearance_metadata(&loc, parsed_file);
+                            self.detected_issues.push(issue_appearance);
+                        }
+                    }
+                    _ => (),
+                },
+                _ => (),
             }
-
-            // Search for the 10**constant pattern in the line
-            if pattern.is_match(line) {
-                if let Some(start) = line.find("10**") {
-                    let byte_start = byte_offset + start;
-                    let byte_end = byte_start + 4; // Assuming "10**" is always four characters
-
-                    let loc = Loc::File(0, byte_start, byte_end);
-                    let issue_appearance = get_appearance_metadata(&loc, parsed_file);
-                    self.detected_issues.push(issue_appearance);
-                }
-            }
-            // Update the byte offset for the next line
-            byte_offset += line.len() + 1; // Add 1 for the newline character
         }
     }
 
@@ -57,14 +53,13 @@ impl Detector for LossOfPrecision {
     fn get_metadata(&self) -> IssueMetadata {
         let metadata: IssueMetadata = IssueMetadata {
             severity: Severities::NC,
-            title: indoc! {"Prefer scientific notation over exponentiation"}.to_string(),
+            title: indoc! {"Potential precision loss from division with large numbers"}.to_string(),
             content: indoc! {
-            "Although the compiler effectively optimizes the use of exponentiation, 
-            it's generally more advisable to employ scientific notation for representing large numbers. 
-            By opting for idioms like <code>1e18</code> instead of <code>10**18</code>, you're using a method that
-            inherently does not require additional compiler optimization.<br>
-             
-            This practice promotes clarity and efficiency in your code, aligning with robust coding standards."}.to_string(),
+            "Division operations with large denominators in Solidity may result in a return value of 
+            zero due to its lack of fractional number support. It's crucial to address this by ensuring 
+            the numerator is always greater than the denominator. A suggested safeguard is to set a required 
+            minimum value for the numerator, mitigating the risk of unexpected precision loss and improving the 
+            accuracy of your computations."}.to_string(),
             gas_saved_per_instance: 0,
         };
 

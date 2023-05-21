@@ -1,7 +1,5 @@
-use std::fs::Metadata;
-
 use self::{
-    Low::pragma_version,
+    Low::{loss_of_precision, pragma_version},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
 
@@ -31,6 +29,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             },
         ),
         Box::new(scientific_notation::ScientificNotation {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(loss_of_precision::LossOfPrecision {
             detected_issues: Vec::new(),
         }),
         /* Add more detector modules */

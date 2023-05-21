@@ -12,9 +12,10 @@ Total: 2 instances over 1 issue
 |-|:-|:-:|
 | [NC-1] | The <code>nonReentrant</code> modifier should precede all other modifiers | 1 |
 | [NC-2] | Prefer scientific notation over exponentiation | 9 |
+| [NC-3] | Potential precision loss from division with large numbers | 8 |
 
 
-Total: 10 instances over 2 issues
+Total: 18 instances over 3 issues
 
 # Low Risk Issues
 ## [L-1] Insecure declaration of <code>pragma</code> version
@@ -127,6 +128,75 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+
+
+
+## [NC-3] Potential precision loss from division with large numbers
+Division operations with large denominators in Solidity may result in a return value of 
+zero due to its lack of fractional number support. It's crucial to address this by ensuring 
+the numerator is always greater than the denominator. A suggested safeguard is to set a required 
+minimum value for the numerator, mitigating the risk of unexpected precision loss and improving the 
+accuracy of your computations.
+
+*This issue was found 8 times:*
+
+```solidity
+File: ./ajna-core/src/ERC721Pool.sol
+
+457:                result.collateralAmount / 1e18
+
+
+537:            uint256 borrowerCollateralRoundedUp = (borrowerCollateral_ + 1e18 - 1) / 1e18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/PoolCommons.sol
+
+281:                mau102 = mau * PERCENT_102 / 1e18;
+
+
+294:            } else if (4 * (tu - mau) > 1e18 - ((tu + mau - 1e18) ** 2) / 1e18) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/TakerActions.sol
+
+356:                takeableCollateral = (takeableCollateral / 1e18) * 1e18;
+
+
+381:                uint256 collateralTaken = (vars_.collateralAmount / 1e18) * 1e18; // solidity rounds down, so if 2.5 it will be 2.5 / 1 = 2
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
+
+181:                pricePrecisionAdjustment_ = uint256(result / 1e18);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Loans.sol
+
+114:                    borrower_.t0Np = (1e18 + poolRate_) * curMomp * t0ThresholdPrice / lup_ / 1e18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
 
 
 
