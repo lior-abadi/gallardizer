@@ -18,7 +18,7 @@ impl Detector for SafeMintERC721 {
             match part {
                 SourceUnitPart::ContractDefinition(def) => {
                     for parent in &def.base {
-                        if parent.name.identifiers[0].name == "ERC721" {
+                        if parent.name.identifiers[0].name.contains("ERC721") {
                             inherits_erc721 = true;
                         }
                     }
