@@ -1,6 +1,6 @@
 use self::{
     Gas::use_custom_errors,
-    Low::{loss_of_precision, pragma_version},
+    Low::{ext_call_for_loop, loss_of_precision, pragma_version},
     Med::{safe_mint_erc721, safe_transfer_erc721},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
@@ -34,6 +34,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(pragma_version::PragmaVersionDetector {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(ext_call_for_loop::ExternalCallInsideForLoopDoS {
             detected_issues: Vec::new(),
         }),
         /* ==== NC ==== */

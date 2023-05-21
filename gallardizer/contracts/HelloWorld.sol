@@ -25,6 +25,23 @@ contract HelloWorld is Pepito, ERC721 {
         require(something, "error");
         revert("error2");
 
+        for (uint256 i = 0; i < something.length; i++) {
+            somefunc.calculate();
+            IERC20(contractAddr).tranf();
+            _callIt();
+        }
+        for (uint256 i = 0; i < 5000; i++) {
+            somefunc.calculate();
+            IERC20(contractAddr).tranf();
+            _callIt();
+        }
+
+        for (uint256 i = 0; i < memLength; i++) {
+            somefunc.calculate();
+            IERC20(contractAddr).tranf();
+            _callIt();
+        }
+
         return num2 / 1e18;
     }
 
