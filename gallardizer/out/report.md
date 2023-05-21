@@ -3,26 +3,37 @@
 | |Issue|Instances|
 |-|:-|:-:|
 | [M-1] | Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs | 1 |
-
-
-Total: 1 instance over 1 issue
-
-## Low Risk Issues
-| |Issue|Instances|
-|-|:-|:-:|
-| [L-1] | Potential precision loss from division with large numbers | 2 |
-| [L-2] | Insecure declaration of <code>pragma</code> version | 2 |
+| [M-2] | Risk of NFT loss with `transferFrom()`, use `safeTransferFrom()` instead | 3 |
 
 
 Total: 4 instances over 2 issues
 
+## Low Risk Issues
+| |Issue|Instances|
+|-|:-|:-:|
+| [L-1] | Potential precision loss from division with large numbers | 8 |
+| [L-2] | Insecure declaration of <code>pragma</code> version | 2 |
+| [L-3] | Denial of service risk from unbounded for-loops with external calls | 5 |
+
+
+Total: 15 instances over 3 issues
+
+## Non-Critical Issues
+| |Issue|Instances|
+|-|:-|:-:|
+| [NC-1] | The <code>nonReentrant</code> modifier should precede all other modifiers | 1 |
+| [NC-2] | Prefer scientific notation over exponentiation | 9 |
+
+
+Total: 10 instances over 2 issues
+
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
 |-|:-|:-:|:-:|
-| [G-1] | Adopt custom errors over `revert()/require()` strings | 2 | 100 |
+| [G-1] | Adopt custom errors over `revert()/require()` strings | 7 | 350 |
 
 
-Total: 2 instances over 1 issue
+Total: 7 instances over 1 issue
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -36,13 +47,48 @@ Not adhering to this practice can lead to tokens being locked or owned by contra
 *This issue found 1 time:*
 
 ```solidity
-File: ./contracts/HelloWorld.sol
+File: ./ajna-core/src/PositionManager.sol
 
-23:            _mint(a, b);
+238:            _mint(params_.recipient, tokenId_);
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/HelloWorld.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/HelloWorld.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+
+
+
+## [M-2] Risk of NFT loss with `transferFrom()`, use `safeTransferFrom()` instead
+The use of `transferFrom()` in transferring NFTs, as outlined in the `EIP-721` [standard](https://github.com/ethereum/EIPs/blob/78e2c297611f5e92b6a5112819ab71f74041ff25/EIPS/eip-721.md?plain=1#L103-L113), 
+places the responsibility on the caller to ensure that the recipient `_to` is capable of 
+receiving NFTs. Failure to ensure this could lead to permanent loss of the NFTs.
+
+By contrast, `safeTransferFrom()` mitigates these risks by performing additional checks to ensure 
+the recipient can handle the token transfer. It's highly advised to use `safeTransferFrom()` over 
+`transferFrom()` to avoid the risk of permanent NFT loss.
+
+*This issue was found 3 times:*
+
+```solidity
+File: ./ajna-core/src/ERC721Pool.sol
+
+612:            IERC721Token(_getArgAddress(COLLATERAL_ADDRESS)).transferFrom(from_, to_, tokenId_);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/RewardsManager.sol
+
+250:            IERC721(address(positionManager)).transferFrom(msg.sender, address(this), tokenId_);
+
+
+302:            IERC721(address(positionManager)).transferFrom(address(this), msg.sender, tokenId_);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
 
 
 
@@ -54,19 +100,65 @@ the numerator is always greater than the denominator. A suggested safeguard is t
 minimum value for the numerator, mitigating the risk of unexpected precision loss and improving the 
 accuracy of your computations.
 
-*This issue was found 2 times:*
+*This issue was found 8 times:*
 
 ```solidity
-File: ./contracts/HelloWorld.sol
+File: ./ajna-core/src/ERC721Pool.sol
 
-22:            uint256 num3 = number / 2e18;
+457:                result.collateralAmount / 1e18
 
 
-28:            return num2 / 1e18;
+537:            uint256 borrowerCollateralRoundedUp = (borrowerCollateral_ + 1e18 - 1) / 1e18;
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/HelloWorld.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/HelloWorld.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/PoolCommons.sol
+
+281:                mau102 = mau * PERCENT_102 / 1e18;
+
+
+294:            } else if (4 * (tu - mau) > 1e18 - ((tu + mau - 1e18) ** 2) / 1e18) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/TakerActions.sol
+
+356:                takeableCollateral = (takeableCollateral / 1e18) * 1e18;
+
+
+381:                uint256 collateralTaken = (vars_.collateralAmount / 1e18) * 1e18; // solidity rounds down, so if 2.5 it will be 2.5 / 1 = 2
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
+
+181:                pricePrecisionAdjustment_ = uint256(result / 1e18);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Loans.sol
+
+114:                    borrower_.t0Np = (1e18 + poolRate_) * curMomp * t0ThresholdPrice / lup_ / 1e18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
 
 
 
@@ -84,16 +176,147 @@ to a more stable project.
 *This issue was found 2 times:*
 
 ```solidity
-File: ./contracts/Test.sol
+File: ./ajna-grants/src/token/AjnaToken.sol
 
-2:    pragma solidity ^0.8.0;
-
-
-3:    pragma solidity ^0.8.1;
+4:    pragma solidity 0.8.7;
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/Test.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/Test.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+
+
+```solidity
+File: ./ajna-grants/src/token/BurnWrapper.sol
+
+4:    pragma solidity 0.8.7;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol)
+
+
+
+## [L-3] Denial of service risk from unbounded for-loops with external calls
+Unbounded for-loops making external calls pose a Denial of Service (DOS) risk due to potential gas limitations. 
+This can disrupt contract operation and even lead to a halt in functionalities. To enhance contract stability and 
+resilience against DOS attacks, consider limiting the number of iterations in these loops, thereby controlling gas 
+consumption and ensuring smoother execution.
+
+*This issue was found 5 times:*
+
+```solidity
+File: ./ajna-core/src/ERC721Pool.sol
+
+561:            for (uint256 i = 0; i < tokenIds_.length;) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/RewardsManager.sol
+
+229:            for (uint256 i = 0; i < positionIndexes.length; ) {
+
+
+229:            for (uint256 i = 0; i < positionIndexes.length; ) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/Funding.sol
+
+62:            for (uint256 i = 0; i < targets_.length; ++i) {
+
+
+112:            for (uint256 i = 0; i < targets_.length;) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+
+
+
+# Non-Critical Issues
+## [NC-1] The <code>nonReentrant</code> modifier should precede all other modifiers
+Prioritizing reentrancy checks before any other calculations or validations within modifiers 
+is a recommended practice for enhancing the security of the protected function.
+
+*This issue found 1 time:*
+
+```solidity
+File: ./ajna-core/src/PositionManager.sol
+
+262:        function moveLiquidity(
+263:            MoveLiquidityParams calldata params_
+264:        ) external override mayInteract(params_.pool, params_.tokenId) nonReentrant {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+
+
+
+## [NC-2] Prefer scientific notation over exponentiation
+Although the compiler effectively optimizes the use of exponentiation, 
+it's generally more advisable to employ scientific notation for representing large numbers. 
+By opting for idioms like <code>1e18</code> instead of <code>10**18</code>, you're using a method that
+inherently does not require additional compiler optimization.<br>
+ 
+This practice promotes clarity and efficiency in your code, aligning with robust coding standards.
+
+*This issue was found 9 times:*
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
+
+102:                minDebtAmount_ = Maths.wdiv(Maths.wdiv(debt_, Maths.wad(loansCount_)), 10**19);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Maths.sol
+
+42:            return (x * y + 10**27 / 2) / 10**27;
+
+
+46:            z = n % 2 != 0 ? x : 10**27;
+
+
+58:            return (x + 10**9 / 2) / 10**9;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/libraries/Maths.sol
+
+6:        uint256 public constant WAD = 10**18;
+
+
+30:            z = z * 10**9;
+
+
+34:            return (x * y + 10**18 / 2) / 10**18;
+
+
+38:            return (x * 10**18 + y / 2) / y;
+
+
+47:            z = n % 2 != 0 ? x : 10**18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
 
 
 
@@ -105,19 +328,55 @@ as it bypasses the need to allocate and store the revert string. In addition, om
 strings conserves deployment gas. Switching to custom errors can be a significant optimization, enhancing the 
 performance and cost-effectiveness of your smart contract.
 
-*This issue was found 2 times:*
+*This issue was found 7 times:*
 
 ```solidity
-File: ./contracts/HelloWorld.sol
+File: ./ajna-core/src/PositionManager.sol
 
-25:            require(something, "error");
-
-
-26:            revert("error2");
+520:            require(_exists(tokenId_));
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/HelloWorld.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/contracts/HelloWorld.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+
+
+```solidity
+File: ./ajna-core/src/base/PermitERC721.sol
+
+80:            require(block.timestamp <= deadline_, "ajna/nft-permit-expired");
+
+
+98:            require(spender_ != owner, "ERC721Permit: approval to current owner");
+
+
+108:                require(recoveredAddress != address(0), "ajna/nft-invalid-signature");
+
+
+109:                require(recoveredAddress == owner, "ajna/nft-unauthorized");
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
+
+76:            require(len % 2 == 0 && len > 0 && len <= 40, 'SafeERC20Namer: INVALID_LEN');
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol)
+
+
+```solidity
+File: ./ajna-grants/src/token/AjnaToken.sol
+
+28:            require(to_ != address(this), "Cannot transfer tokens to the contract itself");
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
 
 
 
