@@ -1,7 +1,5 @@
-use std::fs::Metadata;
-
 use self::{
-    Low::pragma_version,
+    Low::{loss_of_precision, pragma_version},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
 
@@ -10,6 +8,7 @@ use super::report_generator::{
     IssueAppearance, IssueMetadata,
 };
 use crate::utils::file_processor::FileNameWithContent;
+use regex::Regex;
 use solang_parser::pt::Loc;
 
 pub trait Detector {
@@ -30,6 +29,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             },
         ),
         Box::new(scientific_notation::ScientificNotation {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(loss_of_precision::LossOfPrecision {
             detected_issues: Vec::new(),
         }),
         /* Add more detector modules */
@@ -69,6 +71,43 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
     }
 
     return all_detected_issues;
+}
+
+fn get_match_with_regex(parsed_file: &FileNameWithContent, pattern: Regex) -> Vec<IssueAppearance> {
+    let file_content = &parsed_file.file_content;
+    let mut byte_offset = 0;
+    let lines: Vec<&str> = file_content.lines().collect();
+
+    let mut detected_issues: Vec<IssueAppearance> = vec![];
+    // Iterate over each line in the file content
+    for (_index, line) in lines.iter().enumerate() {
+        // Skip the lines starting with //, ///, /**, or *
+        if line.trim().starts_with("//")
+            || line.trim().starts_with("///")
+            || line.trim().starts_with("/**")
+            || line.trim().starts_with("*")
+        {
+            byte_offset += line.len() + 1; // Add 1 for the newline character
+            continue;
+        }
+
+        if pattern.is_match(line) {
+            if let Some(captures) = pattern.captures(line) {
+                let entire_match = captures.get(0).unwrap(); // The entire match is the first capture group
+                let byte_start = byte_offset + entire_match.start();
+                let byte_end = byte_offset + entire_match.end(); // This now gives the end of the entire match
+
+                let loc = Loc::File(0, byte_start, byte_end);
+                let issue_appearance = get_appearance_metadata(&loc, parsed_file);
+                detected_issues.push(issue_appearance);
+            }
+        }
+
+        // Update the byte offset for the next line
+        byte_offset += line.len() + 1; // Add 1 for the newline character
+    }
+
+    return detected_issues;
 }
 
 pub fn get_appearance_metadata(loc: &Loc, parsed_file: &FileNameWithContent) -> IssueAppearance {
