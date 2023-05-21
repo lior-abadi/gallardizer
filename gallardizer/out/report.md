@@ -3,9 +3,10 @@
 | |Issue|Instances|
 |-|:-|:-:|
 | [M-1] | Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs | 1 |
+| [M-2] | Risk of NFT loss with `transferFrom()`, use `safeTransferFrom()` instead | 3 |
 
 
-Total: 1 instance over 1 issue
+Total: 4 instances over 2 issues
 
 ## Low Risk Issues
 | |Issue|Instances|
@@ -44,6 +45,41 @@ File: ./ajna-core/src/PositionManager.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+
+
+
+## [M-2] Risk of NFT loss with `transferFrom()`, use `safeTransferFrom()` instead
+The use of `transferFrom()` in transferring NFTs, as outlined in the `EIP-721` [standard](https://github.com/ethereum/EIPs/blob/78e2c297611f5e92b6a5112819ab71f74041ff25/EIPS/eip-721.md?plain=1#L103-L113), 
+places the responsibility on the caller to ensure that the recipient `_to` is capable of 
+receiving NFTs. Failure to ensure this could lead to permanent loss of the NFTs.
+
+By contrast, `safeTransferFrom()` mitigates these risks by performing additional checks to ensure 
+the recipient can handle the token transfer. It's highly advised to use `safeTransferFrom()` over 
+`transferFrom()` to avoid the risk of permanent NFT loss.
+
+*This issue was found 3 times:*
+
+```solidity
+File: ./ajna-core/src/ERC721Pool.sol
+
+612:            IERC721Token(_getArgAddress(COLLATERAL_ADDRESS)).transferFrom(from_, to_, tokenId_);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/RewardsManager.sol
+
+250:            IERC721(address(positionManager)).transferFrom(msg.sender, address(this), tokenId_);
+
+
+302:            IERC721(address(positionManager)).transferFrom(address(this), msg.sender, tokenId_);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
 
 
 
