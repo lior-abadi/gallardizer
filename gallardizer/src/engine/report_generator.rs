@@ -129,12 +129,16 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
     md.write(issue_summary_header.heading(1)).unwrap();
 
     // Generate the report's summary
+    let mut global_instance_amount: usize = 0;
+    let mut global_issue_amount: usize = 0;
+    let mut global_gas_savings: usize = 0;
+
     for severity in &[
         Severities::H,
         Severities::M,
         Severities::L,
         Severities::NC,
-        Severities::Gas, // Replace with the actual GasParams value if available
+        Severities::Gas,
     ] {
         // Filter the issues for the current severity
         let severity_issues: Vec<&Issue> = sorted_issues
@@ -156,6 +160,12 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
 
             for issue in severity_issues {
                 total_issue_instances += issue.issue_appearances.len();
+
+                // Total gas saved accounting
+                if (severity == &Severities::Gas) {
+                    global_gas_savings +=
+                        (issue.metadata.gas_saved_per_instance as usize) * total_issue_instances;
+                }
             }
 
             let instance_word: String;
@@ -172,15 +182,38 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
                 "issue".to_string()
             };
 
-            let instances_detail = format!(
-                "Total: {} {instance_word} over {} {issue_word}",
-                &total_issue_instances.to_string(),
-                &issues_found.to_string()
-            );
+            let instances_detail: String;
+            if (severity != &Severities::Gas) {
+                instances_detail = format!(
+                    "Total: {} {instance_word} over {} {issue_word}",
+                    &total_issue_instances.to_string(),
+                    &issues_found.to_string()
+                );
+            } else {
+                instances_detail = format!(
+                    "Total: {} {instance_word} over {} {issue_word}, saving over {} gas units",
+                    &total_issue_instances.to_string(),
+                    &issues_found.to_string(),
+                    &global_gas_savings.to_string()
+                );
+            }
 
             md.write(instances_detail.paragraph()).unwrap();
+
+            // Global amounts accounting
+            global_instance_amount += &total_issue_instances;
+            global_issue_amount += &issues_found;
         }
     }
+
+    md.write("Overall Results".heading(2)).unwrap();
+    let global_detail = format!(
+        "Total: {} instances over {} issues, potentially saving over {} gas units",
+        &global_instance_amount.to_string(),
+        &global_issue_amount.to_string(),
+        &global_gas_savings.to_string()
+    );
+    md.write(global_detail.bold().paragraph()).unwrap();
 
     // Generate the report for each severity group
     for severity in &[
