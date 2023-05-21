@@ -1,4 +1,5 @@
 use self::{
+    Gas::use_custom_errors,
     Low::{loss_of_precision, pragma_version},
     Med::{safe_mint_erc721, safe_transfer_erc721},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
@@ -21,9 +22,21 @@ pub trait Detector {
 
 fn get_all_detectors() -> Vec<Box<dyn Detector>> {
     return vec![
+        /* ==== MED ==== */
+        Box::new(safe_mint_erc721::SafeMintERC721 {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(safe_transfer_erc721::SafeTransferERC721 {
+            detected_issues: Vec::new(),
+        }),
+        /* ==== LOW ==== */
+        Box::new(loss_of_precision::LossOfPrecision {
+            detected_issues: Vec::new(),
+        }),
         Box::new(pragma_version::PragmaVersionDetector {
             detected_issues: Vec::new(),
         }),
+        /* ==== NC ==== */
         Box::new(
             reentrancy_modifier_precedence::ReentrancyModifierPrecedence {
                 detected_issues: Vec::new(),
@@ -32,13 +45,8 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(scientific_notation::ScientificNotation {
             detected_issues: Vec::new(),
         }),
-        Box::new(loss_of_precision::LossOfPrecision {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(safe_mint_erc721::SafeMintERC721 {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(safe_transfer_erc721::SafeTransferERC721 {
+        /* ==== GAS ==== */
+        Box::new(use_custom_errors::CustomErrorsInsteadOfRevertStrings {
             detected_issues: Vec::new(),
         }),
         /* Add more detector modules */

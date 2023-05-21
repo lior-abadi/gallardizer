@@ -21,6 +21,10 @@ contract HelloWorld is Pepito, ERC721 {
         uint256 num2 = number / 354;
         uint256 num3 = number / 2e18;
         _mint(a, b);
+
+        require(something, "error");
+        revert("error2");
+
         return num2 / 1e18;
     }
 
