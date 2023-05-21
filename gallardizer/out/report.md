@@ -14,9 +14,10 @@ Total: 4 instances over 2 issues
 | [L-1] | Potential precision loss from division with large numbers | 8 |
 | [L-2] | Insecure declaration of <code>pragma</code> version | 2 |
 | [L-3] | Denial of service risk from unbounded for-loops with external calls | 5 |
+| [L-4] | Reversals due to division by zero | 6 |
 
 
-Total: 15 instances over 3 issues
+Total: 21 instances over 4 issues
 
 ## Non-Critical Issues
 | |Issue|Instances|
@@ -36,7 +37,7 @@ Total: 10 instances over 2 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 36 instances over 8 issues, potentially saving over 350 gas units**
+**Total: 42 instances over 9 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -241,6 +242,61 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+
+
+
+## [L-4] Reversals due to division by zero
+A division operation lacks necessary zero-value checks on any parameter used as denominator, 
+which could result in the function reverting if zero is passed as an argument. It's crucial to implement 
+safeguards against such division by zero errors to prevent unexpected function reverts and maintain the 
+integrity of each contract's calculations.
+
+*This issue was found 6 times:*
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
+
+248:            scaledAmount_ = (amount_ / tokenScale_) * tokenScale_;
+
+
+389:            uint256 thresholdPrice = borrowerDebt_  * Maths.WAD / collateral_;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Loans.sol
+
+114:                    borrower_.t0Np = (1e18 + poolRate_) * curMomp * t0ThresholdPrice / lup_ / 1e18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Maths.sol
+
+22:            return (x * WAD + y / 2) / y;
+
+
+26:            return (x * WAD) / y;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/libraries/Maths.sol
+
+38:            return (x * 10**18 + y / 2) / y;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
 
 
 

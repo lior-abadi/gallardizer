@@ -13,7 +13,6 @@ impl Detector for ReentrancyModifierPrecedence {
         for part in &parsed_file.parsed_ast_tree.0 {
             match part {
                 SourceUnitPart::ContractDefinition(def) => {
-                    // println!("Found contract {:?}", def.name);
                     for part in &def.parts {
                         match part {
                             ContractPart::FunctionDefinition(def) => {
