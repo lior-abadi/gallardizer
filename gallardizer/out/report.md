@@ -33,10 +33,10 @@ Total: 10 instances over 2 issues
 | [G-1] | Adopt custom errors over `revert()/require()` strings | 7 | 350 |
 
 
-Total: 7 instances over 1 issue
+Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 36 instances over 8 issues**
+**Total: 36 instances over 8 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
