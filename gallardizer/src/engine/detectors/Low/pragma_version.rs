@@ -10,6 +10,7 @@ pub struct PragmaVersionDetector {
 
 impl Detector for PragmaVersionDetector {
     fn run_detector(&mut self, parsed_file: &FileNameWithContent) {
+        // Checks if the pragma version is under 0.8.0 and if it is floating
         for part in &parsed_file.parsed_ast_tree.0 {
             match part {
                 SourceUnitPart::PragmaDirective(loc, _opt, _opt_lit) => {

@@ -1,10 +1,9 @@
-use crate::engine::detectors::{get_appearance_metadata, get_match_with_regex, Detector};
+use crate::engine::detectors::{get_match_with_regex, Detector};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
 use regex::Regex;
-use solang_parser::pt::Loc;
 
 pub struct ScientificNotation {
     pub detected_issues: Vec<IssueAppearance>,

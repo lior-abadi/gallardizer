@@ -2,7 +2,7 @@
 // compiler version must be greater than or equal to 0.8.17 and less than 0.9.0
 pragma solidity 0.8.17;
 
-contract HelloWorld {
+contract HelloWorld is Pepito, ERC721 {
     string public greet = "Hello World!";
 
     modifier nonReentrant() {
@@ -20,7 +20,7 @@ contract HelloWorld {
     function calculate(uint256 number) public returns (uint256) {
         uint256 num2 = number / 354;
         uint256 num3 = number / 2e18;
-
+        _mint(a, b);
         return num2 / 1e18;
     }
 

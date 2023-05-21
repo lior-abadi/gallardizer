@@ -52,7 +52,7 @@ impl Detector for LossOfPrecision {
 
     fn get_metadata(&self) -> IssueMetadata {
         let metadata: IssueMetadata = IssueMetadata {
-            severity: Severities::NC,
+            severity: Severities::L,
             title: indoc! {"Potential precision loss from division with large numbers"}.to_string(),
             content: indoc! {
             "Division operations with large denominators in Solidity may result in a return value of 
