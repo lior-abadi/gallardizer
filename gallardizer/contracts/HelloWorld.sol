@@ -16,7 +16,12 @@ contract HelloWorld {
     // }
 
     function test(uint256 a, uint256 b) external returns (uint256) {
-        assert(b != 0);
+        revert();
+        revert("Someting");
+        require(a != b, "perro");
+        require(a != b);
+
+        manuelito(a != 0);
         return a / b;
     }
 

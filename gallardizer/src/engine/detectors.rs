@@ -5,7 +5,7 @@ use self::{
         require_instead_of_assert,
     },
     Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721},
-    NonCritical::{reentrancy_modifier_precedence, scientific_notation},
+    NonCritical::{reentrancy_modifier_precedence, revert_strings, scientific_notation},
 };
 
 use super::report_generator::{
@@ -48,6 +48,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(require_instead_of_assert::RequireInsteadOfAssert {
             detected_issues: Vec::new(),
         }),
+        Box::new(division_by_zero::DivisionByZero {
+            detected_issues: Vec::new(),
+        }),
         /* ==== NC ==== */
         Box::new(
             reentrancy_modifier_precedence::ReentrancyModifierPrecedence {
@@ -57,7 +60,7 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(scientific_notation::ScientificNotation {
             detected_issues: Vec::new(),
         }),
-        Box::new(division_by_zero::DivisionByZero {
+        Box::new(revert_strings::RevertStrings {
             detected_issues: Vec::new(),
         }),
         /* ==== GAS ==== */

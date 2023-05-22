@@ -24,9 +24,10 @@ Total: 20 instances over 4 issues
 |-|:-|:-:|
 | [NC-1] | The <code>nonReentrant</code> modifier should precede all other modifiers | 1 |
 | [NC-2] | Prefer scientific notation over exponentiation | 9 |
+| [NC-3] | Add descriptive revert reasons | 1 |
 
 
-Total: 10 instances over 2 issues
+Total: 11 instances over 3 issues
 
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
@@ -37,7 +38,7 @@ Total: 10 instances over 2 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 41 instances over 9 issues, potentially saving over 350 gas units**
+**Total: 42 instances over 10 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -48,7 +49,7 @@ interface.<br>
 The main difference resides in the checks made after minting that ensure the reception of the token (e.g. Openzeppelin's <code>_checkOnERC721Received</code>).
 Not adhering to this practice can lead to tokens being locked or owned by contracts that aren't equipped to handle them.
 
-*This issue found 1 time:*
+*This issue was found 1 time:*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -295,7 +296,7 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 Prioritizing reentrancy checks before any other calculations or validations within modifiers 
 is a recommended practice for enhancing the security of the protected function.
 
-*This issue found 1 time:*
+*This issue was found 1 time:*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -366,6 +367,26 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+
+
+
+## [NC-3] Add descriptive revert reasons
+Include descriptive reason strings in `require()` and `revert()` for 
+improved error handling and user feedback. Since Solidity `0.8.4`, 
+[custom errors](https://blog.soliditylang.org/2021/04/21/custom-errors/) offer a concise, 
+detailed alternative for reversion, facilitating better contract usability and debugging 
+also providing a more efficient way of reverting.
+
+*This issue was found 1 time:*
+
+```solidity
+File: ./ajna-core/src/PositionManager.sol
+
+520:            require(_exists(tokenId_));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
 
 
 
