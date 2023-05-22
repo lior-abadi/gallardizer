@@ -3,7 +3,7 @@ use crate::engine::parser::{extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
-use solang_parser::pt::{Expression, Identifier, Loc};
+use solang_parser::pt::{Expression, Loc};
 
 pub struct ExternalCallInsideForLoopDoS {
     pub detected_issues: Vec<IssueAppearance>,
@@ -36,7 +36,7 @@ impl Detector for ExternalCallInsideForLoopDoS {
             }
 
             // If the loop is bounded, we assume that this was considered
-            if (!detected_unbound_length) {
+            if !detected_unbound_length {
                 continue;
             }
 
@@ -45,7 +45,7 @@ impl Detector for ExternalCallInsideForLoopDoS {
                 let calls = function_call.clone().expression().unwrap();
 
                 match &calls {
-                    Expression::FunctionCall(loc, expr, _params) => {
+                    Expression::FunctionCall(_loc, expr, _params) => {
                         if let Expression::MemberAccess(_, _, _) = **expr {
                             let issue_appearance =
                                 get_appearance_metadata(&cached_less_loc, parsed_file);

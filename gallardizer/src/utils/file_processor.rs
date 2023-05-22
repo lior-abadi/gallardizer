@@ -1,10 +1,8 @@
 use solang_parser::pt::SourceUnit;
 use std::env;
-use std::ffi::OsStr;
 use std::fs;
 use std::io::{self, Read};
 use std::path::Path;
-use std::path::PathBuf;
 use walkdir::WalkDir;
 
 #[derive(Debug)]

@@ -36,7 +36,7 @@ impl Detector for SafeMintERC721 {
                 // FunctionCall is an expression
                 let expression = node.expression().unwrap();
 
-                if let Expression::FunctionCall(loc, selector, params) = expression {
+                if let Expression::FunctionCall(loc, selector, _params) = expression {
                     if let Expression::Variable(identifier) = *selector {
                         if identifier.name == "_mint" {
                             self.detected_issues

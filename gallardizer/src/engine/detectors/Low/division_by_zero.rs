@@ -1,5 +1,5 @@
 use crate::engine::detectors::{get_appearance_metadata, Detector};
-use crate::engine::parser::{contract_part_as_target, extract_target_from_node, Target};
+use crate::engine::parser::{extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
@@ -27,12 +27,12 @@ impl Detector for DivisionByZero {
                 match &part {
                     ContractPart::FunctionDefinition(def) => {
                         // This condition is pretty severe but ensures that no false positives might arise
-                        if (has_require_statements(&def)) {
+                        if has_require_statements(&def) {
                             continue;
                         }
 
                         let divide_detection: DivideCheckReturn = divides_by_parameter(def);
-                        if (divide_detection.detected) {
+                        if divide_detection.detected {
                             let issue_appearance =
                                 get_appearance_metadata(&divide_detection.loc, parsed_file);
                             self.detected_issues.push(issue_appearance);
@@ -46,12 +46,12 @@ impl Detector for DivisionByZero {
                 match &part {
                     SourceUnitPart::FunctionDefinition(def) => {
                         // This condition is pretty severe but ensures that no false positives might arise
-                        if (has_require_statements(&def)) {
+                        if has_require_statements(&def) {
                             continue;
                         }
 
                         let divide_detection: DivideCheckReturn = divides_by_parameter(def);
-                        if (divide_detection.detected) {
+                        if divide_detection.detected {
                             let issue_appearance =
                                 get_appearance_metadata(&divide_detection.loc, parsed_file);
                             self.detected_issues.push(issue_appearance);
@@ -104,7 +104,7 @@ fn has_require_statements(def: &Box<FunctionDefinition>) -> bool {
                 let call_expression = function_call.expression().unwrap();
                 if let Expression::FunctionCall(_, body, _) = call_expression {
                     match *body {
-                        Expression::Variable(identifier) => {
+                        Expression::Variable(_identifier) => {
                             // The following condition is ideal
                             // return identifier.name == "require";
 
