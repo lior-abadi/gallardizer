@@ -1,6 +1,9 @@
 use self::{
     Gas::use_custom_errors,
-    Low::{division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version},
+    Low::{
+        division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version,
+        require_instead_of_assert,
+    },
     Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
@@ -42,6 +45,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(ext_call_for_loop::ExternalCallInsideForLoopDoS {
             detected_issues: Vec::new(),
         }),
+        Box::new(require_instead_of_assert::RequireInsteadOfAssert {
+            detected_issues: Vec::new(),
+        }),
         /* ==== NC ==== */
         Box::new(
             reentrancy_modifier_precedence::ReentrancyModifierPrecedence {
@@ -67,8 +73,11 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
 
     let mut all_detected_issues: Vec<Issue> = Vec::new();
 
+    // print!("Running detectors...\n");
     for mut detector in detectors {
         let detector_name = detector.get_detector_name();
+
+        // print!("\nCurrently Running: {detector_name}");
 
         for file in &parsed_files {
             detector.run_detector(&file);
@@ -77,7 +86,10 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
         let detector_detected_issues: Vec<IssueAppearance> = detector.get_detected_issues();
 
         // Store only detected issues
-        if detector_detected_issues.len() != 0 {
+        let amount_of_issues_detected = detector_detected_issues.len();
+        // print!("\nIssues Detected: {amount_of_issues_detected}\n");
+
+        if amount_of_issues_detected != 0 {
             let current_issue_metadata: IssueMetadata = detector.get_metadata();
             let current_issue: Issue = Issue {
                 issue_appearances: (detector_detected_issues),
