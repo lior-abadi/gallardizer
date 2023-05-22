@@ -363,7 +363,7 @@ fn times_found_text(times_found: &usize) -> String {
         return format!("This issue was found {} times:", times_found);
     }
 
-    return format!("This issue found {} time:", times_found);
+    return format!("This issue was found {} time:", times_found);
 }
 fn remove_auto_generated_backslashes(file_path: &str) -> io::Result<()> {
     let file_content = fs::read_to_string(file_path)?;
