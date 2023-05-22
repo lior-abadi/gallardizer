@@ -77,7 +77,7 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
         let detector_detected_issues: Vec<IssueAppearance> = detector.get_detected_issues();
 
         // Store only detected issues
-        if (detector_detected_issues.len() != 0) {
+        if detector_detected_issues.len() != 0 {
             let current_issue_metadata: IssueMetadata = detector.get_metadata();
             let current_issue: Issue = Issue {
                 issue_appearances: (detector_detected_issues),

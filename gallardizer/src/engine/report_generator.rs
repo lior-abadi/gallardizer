@@ -111,7 +111,7 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
     let mut md = Markdown::new(file);
 
     // Sort inner appearances by file and line
-    for mut issue in issues.iter_mut() {
+    for issue in issues.iter_mut() {
         sort_appearances_by_file_and_line(&mut issue.issue_appearances);
     }
 
@@ -162,7 +162,7 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
                 total_issue_instances += issue.issue_appearances.len();
 
                 // Total gas saved accounting
-                if (severity == &Severities::Gas) {
+                if severity == &Severities::Gas {
                     global_gas_savings +=
                         (issue.metadata.gas_saved_per_instance as usize) * total_issue_instances;
                 }
@@ -170,20 +170,20 @@ fn generate_report(file: File, mut issues: Vec<Issue>, github_link: &str) {
 
             let instance_word: String;
 
-            if (total_issue_instances != 1) {
+            if total_issue_instances != 1 {
                 instance_word = "instances".to_string();
             } else {
                 instance_word = "instance".to_string();
             };
 
-            let issue_word = if (issues_found != 1) {
+            let issue_word = if issues_found != 1 {
                 "issues".to_string()
             } else {
                 "issue".to_string()
             };
 
             let instances_detail: String;
-            if (severity != &Severities::Gas) {
+            if severity != &Severities::Gas {
                 instances_detail = format!(
                     "Total: {} {instance_word} over {} {issue_word}",
                     &total_issue_instances.to_string(),
@@ -285,7 +285,7 @@ fn format_issue(
     }
 
     md.write("```".paragraph()).unwrap();
-    if (github_link != "") {
+    if github_link != "" {
         let file_path_without_prefix = previous_file_path
             .strip_prefix("./")
             .unwrap_or(previous_file_path);
@@ -315,13 +315,13 @@ fn format_appearance(
 ) -> String {
     let mut formatted_appearance: String = "".to_string();
 
-    if (current_file_path != previous_file_path) {
+    if current_file_path != previous_file_path {
         // If this is not the first finding, it means that we need to close the previous codeblock
-        if (previous_file_path != "") {
+        if previous_file_path != "" {
             formatted_appearance += "```\n";
 
             // If a Github link to the project was provided, reference that after closing the block.
-            if (github_link != "") {
+            if github_link != "" {
                 let file_path_without_prefix = previous_file_path
                     .strip_prefix("./")
                     .unwrap_or(previous_file_path);
@@ -378,7 +378,7 @@ fn generate_summary_table(md: &mut Markdown<File>, issues: &Vec<&Issue>, severit
     // We want to different types: only for Gas add a new column with the amount saved.
     let header_with_placeholder: &str;
 
-    if (severity != &Severities::Gas) {
+    if severity != &Severities::Gas {
         header_with_placeholder = "| |Issue|Instances|\n|-|:-|:-:|";
         let mut position_id: u32 = 1;
 

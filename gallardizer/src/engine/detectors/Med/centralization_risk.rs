@@ -1,14 +1,10 @@
-use std::any::Any;
-
 use crate::engine::detectors::{get_appearance_metadata, Detector};
 use crate::engine::parser::{extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
-use solang_parser::pt::{
-    ContractPart, Expression, FunctionAttribute, IdentifierPath, SourceUnitPart,
-};
+use solang_parser::pt::{ContractPart, FunctionAttribute, IdentifierPath};
 
 pub struct CentralizationRisk {
     pub detected_issues: Vec<IssueAppearance>,
@@ -30,7 +26,6 @@ impl Detector for CentralizationRisk {
 
             if let Some(contract_part) = some_contract_part {
                 // FunctionDefinition is a contract part from now
-                println!("{:?}\n", contract_part);
                 if let ContractPart::FunctionDefinition(def) = contract_part {
                     for attribute in &def.attributes {
                         match attribute {
@@ -38,7 +33,6 @@ impl Detector for CentralizationRisk {
                                 let IdentifierPath { identifiers, .. } = &base.name;
 
                                 for identifier in identifiers {
-                                    println!("{:?}\n", identifier);
                                     if identifier.name.contains("onlyOwner") {
                                         self.detected_issues
                                             .push(get_appearance_metadata(&loc, parsed_file));

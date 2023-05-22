@@ -121,6 +121,7 @@ pub enum Target {
     None,
 }
 
+#[allow(dead_code)]
 pub fn new_targets(targets: Vec<Target>) -> HashSet<Target> {
     let mut target_set = HashSet::new();
 
@@ -258,6 +259,7 @@ pub fn extract_target_from_node(target: Target, node: Node) -> Vec<Node> {
     return walk_node_for_targets(&target_set, node);
 }
 
+#[allow(dead_code)]
 pub fn extract_targets_from_node(targets: Vec<Target>, node: Node) -> Vec<Node> {
     let mut target_set = HashSet::new();
 

@@ -30,7 +30,7 @@ impl Detector for SafeTransferERC721 {
                 _ => (),
             }
         }
-        if (!inherits_erc20) {
+        if !inherits_erc20 {
             let target_nodes = extract_target_from_node(
                 Target::MemberAccess,
                 parsed_file.parsed_ast_tree.clone().into(),
