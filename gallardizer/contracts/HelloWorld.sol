@@ -3,20 +3,20 @@
 pragma solidity 0.8.17;
 
 contract HelloWorld {
-    modifier nonReentrant() {
-        _;
-    }
+    // modifier nonReentrant() {
+    //     _;
+    // }
 
-    modifier someModifier() {
-        _;
-    }
+    // modifier someModifier() {
+    //     _;
+    // }
 
-    modifier onlyOwner() {
-        _;
-    }
+    // modifier onlyOwner() {
+    //     _;
+    // }
 
-    function test(uint256 a, uint256 b) external onlyOwner nonReentrant returns (uint256) {
-        require(b != 0);
+    function test(uint256 a, uint256 b) external returns (uint256) {
+        assert(b != 0);
         return a / b;
     }
 

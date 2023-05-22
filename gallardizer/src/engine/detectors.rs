@@ -1,6 +1,9 @@
 use self::{
     Gas::use_custom_errors,
-    Low::{division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version},
+    Low::{
+        division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version,
+        require_instead_of_assert,
+    },
     Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
@@ -40,6 +43,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(ext_call_for_loop::ExternalCallInsideForLoopDoS {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(require_instead_of_assert::RequireInsteadOfAssert {
             detected_issues: Vec::new(),
         }),
         /* ==== NC ==== */
