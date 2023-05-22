@@ -16,7 +16,7 @@ pub fn parse_targets(targets: Vec<FileNameWithContent>) -> Vec<FileNameWithConte
     return parsed_files;
 }
 
-#[derive(Eq, Hash, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, Hash, PartialEq, Clone, Copy)]
 pub enum Target {
     //Statement Targets
     Args,

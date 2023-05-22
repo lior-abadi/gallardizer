@@ -26,8 +26,6 @@ impl Detector for ExternalCallInsideForLoopDoS {
                 match for_loop_less {
                     Expression::Less(loc, _right_hand, left_hand) => {
                         cached_less_loc = loc;
-
-                        print!("\n{:?}\n", &left_hand);
                         if let Expression::MemberAccess(_, _, identifier) = *left_hand {
                             detected_unbound_length = &identifier.name == "length";
                         }
@@ -49,8 +47,6 @@ impl Detector for ExternalCallInsideForLoopDoS {
                 match &calls {
                     Expression::FunctionCall(loc, expr, _params) => {
                         if let Expression::MemberAccess(_, _, _) = **expr {
-                            print!("\nDETECTED EXTERNAL CALL\n",);
-
                             let issue_appearance =
                                 get_appearance_metadata(&cached_less_loc, parsed_file);
                             self.detected_issues.push(issue_appearance);
