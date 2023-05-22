@@ -1,10 +1,10 @@
-use crate::engine::detectors::{get_match_with_regex, Detector};
+use crate::engine::detectors::{get_appearance_metadata, Detector};
+use crate::engine::parser::{extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
-use regex::Regex;
-use solang_parser::pt::SourceUnitPart;
+use solang_parser::pt::{Expression, SourceUnitPart};
 
 pub struct SafeTransferERC721 {
     pub detected_issues: Vec<IssueAppearance>,
@@ -31,10 +31,21 @@ impl Detector for SafeTransferERC721 {
             }
         }
         if (!inherits_erc20) {
-            let pattern: Regex = Regex::new(r"transferFrom\([^,]+,\s*[^,]+,\s*[^,]+\)").unwrap();
-            let detected_issues_with_regex = get_match_with_regex(parsed_file, pattern);
-            for detected_issue in detected_issues_with_regex {
-                self.detected_issues.push(detected_issue);
+            let target_nodes = extract_target_from_node(
+                Target::MemberAccess,
+                parsed_file.parsed_ast_tree.clone().into(),
+            );
+
+            for node in target_nodes {
+                // MemberAccess is an expression
+                let expression = node.expression().unwrap();
+
+                if let Expression::MemberAccess(loc, _, identifier) = expression {
+                    if identifier.name == "transferFrom" {
+                        self.detected_issues
+                            .push(get_appearance_metadata(&loc, parsed_file));
+                    }
+                }
             }
         }
     }
