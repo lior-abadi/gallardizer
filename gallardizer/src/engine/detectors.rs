@@ -1,7 +1,7 @@
 use self::{
     Gas::use_custom_errors,
     Low::{division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version},
-    Med::{safe_mint_erc721, safe_transfer_erc721},
+    Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721},
     NonCritical::{reentrancy_modifier_precedence, scientific_notation},
 };
 
@@ -27,6 +27,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(safe_transfer_erc721::SafeTransferERC721 {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(centralization_risk::CentralizationRisk {
             detected_issues: Vec::new(),
         }),
         /* ==== LOW ==== */
