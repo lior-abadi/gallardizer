@@ -73,8 +73,11 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
 
     let mut all_detected_issues: Vec<Issue> = Vec::new();
 
+    // print!("Running detectors...\n");
     for mut detector in detectors {
         let detector_name = detector.get_detector_name();
+
+        // print!("\nCurrently Running: {detector_name}");
 
         for file in &parsed_files {
             detector.run_detector(&file);
@@ -83,7 +86,10 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
         let detector_detected_issues: Vec<IssueAppearance> = detector.get_detected_issues();
 
         // Store only detected issues
-        if detector_detected_issues.len() != 0 {
+        let amount_of_issues_detected = detector_detected_issues.len();
+        // print!("\nIssues Detected: {amount_of_issues_detected}\n");
+
+        if amount_of_issues_detected != 0 {
             let current_issue_metadata: IssueMetadata = detector.get_metadata();
             let current_issue: Issue = Issue {
                 issue_appearances: (detector_detected_issues),
