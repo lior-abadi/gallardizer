@@ -1,5 +1,5 @@
 use crate::engine::detectors::{get_appearance_metadata, Detector};
-use crate::engine::parser::{extract_target_from_node, Target};
+use crate::engine::parser::{contract_part_as_target, extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
@@ -19,36 +19,45 @@ impl Detector for DivisionByZero {
         );
 
         for function in function_definitions {
-            let mut has_require: bool = false;
             // Handle both functions declared inside or outside a contract
             let some_contract_part: Option<ContractPart> = function.clone().contract_part();
             let some_source_part: Option<SourceUnitPart> = function.source_unit_part();
 
             if let Some(part) = some_contract_part {
-                // This condition is pretty severe but ensures that no false positives might arise
-                if (has_require_statements(part.clone())) {
-                    continue;
-                }
+                match &part {
+                    ContractPart::FunctionDefinition(def) => {
+                        // This condition is pretty severe but ensures that no false positives might arise
+                        if (has_require_statements(&def)) {
+                            continue;
+                        }
 
-                let divide_detection: DivideCheckReturn = divides_by_parameter(part.clone());
-                if (divide_detection.detected) {
-                    let issue_appearance =
-                        get_appearance_metadata(&divide_detection.loc, parsed_file);
-                    self.detected_issues.push(issue_appearance);
+                        let divide_detection: DivideCheckReturn = divides_by_parameter(def);
+                        if (divide_detection.detected) {
+                            let issue_appearance =
+                                get_appearance_metadata(&divide_detection.loc, parsed_file);
+                            self.detected_issues.push(issue_appearance);
+                        }
+                    }
+                    _ => (),
                 }
             }
 
             if let Some(part) = some_source_part {
-                // This condition is pretty severe but ensures that no false positives might arise
-                if (has_require_statements1(part.clone())) {
-                    continue;
-                }
+                match &part {
+                    SourceUnitPart::FunctionDefinition(def) => {
+                        // This condition is pretty severe but ensures that no false positives might arise
+                        if (has_require_statements(&def)) {
+                            continue;
+                        }
 
-                let divide_detection: DivideCheckReturn = divides_by_parameter1(part.clone());
-                if (divide_detection.detected) {
-                    let issue_appearance =
-                        get_appearance_metadata(&divide_detection.loc, parsed_file);
-                    self.detected_issues.push(issue_appearance);
+                        let divide_detection: DivideCheckReturn = divides_by_parameter(def);
+                        if (divide_detection.detected) {
+                            let issue_appearance =
+                                get_appearance_metadata(&divide_detection.loc, parsed_file);
+                            self.detected_issues.push(issue_appearance);
+                        }
+                    }
+                    _ => (),
                 }
             }
         }
@@ -78,70 +87,31 @@ impl Detector for DivisionByZero {
     }
 }
 
-fn has_require_statements(contract_part: ContractPart) -> bool {
-    match contract_part {
-        ContractPart::FunctionDefinition(def) => {
-            if let Some(Statement::Block {
-                loc: _,
-                unchecked: _,
-                statements,
-            }) = &def.body
-            {
-                for function_body_members in statements {
-                    let function_calls = extract_target_from_node(
-                        Target::FunctionCall,
-                        function_body_members.clone().into(),
-                    );
+fn has_require_statements(def: &Box<FunctionDefinition>) -> bool {
+    if let Some(Statement::Block {
+        loc: _,
+        unchecked: _,
+        statements,
+    }) = &def.body
+    {
+        for function_body_members in statements {
+            let function_calls = extract_target_from_node(
+                Target::FunctionCall,
+                function_body_members.clone().into(),
+            );
 
-                    for function_call in function_calls {
-                        let call_expression = function_call.expression().unwrap();
-                        if let Expression::FunctionCall(_, body, _) = call_expression {
-                            match *body {
-                                Expression::Variable(identifier) => {
-                                    return identifier.name == "require";
-                                }
-                                _ => (),
-                            }
+            for function_call in function_calls {
+                let call_expression = function_call.expression().unwrap();
+                if let Expression::FunctionCall(_, body, _) = call_expression {
+                    match *body {
+                        Expression::Variable(identifier) => {
+                            return identifier.name == "require";
                         }
+                        _ => (),
                     }
                 }
             }
         }
-        _ => (),
-    }
-    return false;
-}
-
-fn has_require_statements1(source_part: SourceUnitPart) -> bool {
-    match source_part {
-        SourceUnitPart::FunctionDefinition(def) => {
-            if let Some(Statement::Block {
-                loc: _,
-                unchecked: _,
-                statements,
-            }) = &def.body
-            {
-                for function_body_members in statements {
-                    let function_calls = extract_target_from_node(
-                        Target::FunctionCall,
-                        function_body_members.clone().into(),
-                    );
-
-                    for function_call in function_calls {
-                        let call_expression = function_call.expression().unwrap();
-                        if let Expression::FunctionCall(_, body, _) = call_expression {
-                            match *body {
-                                Expression::Variable(identifier) => {
-                                    return identifier.name == "require";
-                                }
-                                _ => (),
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        _ => (),
     }
     return false;
 }
@@ -151,104 +121,44 @@ struct DivideCheckReturn {
     loc: Loc,
 }
 
-fn divides_by_parameter(contract_part: ContractPart) -> DivideCheckReturn {
+fn divides_by_parameter(def: &Box<FunctionDefinition>) -> DivideCheckReturn {
     let mut params: Vec<String> = vec![];
-    match contract_part {
-        ContractPart::FunctionDefinition(def) => {
-            for (_, parameter) in &def.params {
-                if let Some(Parameter {
-                    name: Some(Identifier { name, .. }),
-                    ..
-                }) = parameter
-                {
-                    params.push(name.to_string());
-                }
-            }
 
-            if let Some(Statement::Block {
-                loc: _,
-                unchecked: _,
-                statements,
-            }) = &def.body
-            {
-                for function_body_members in statements {
-                    let divides_in_tree = extract_target_from_node(
-                        Target::Divide,
-                        function_body_members.clone().into(),
-                    );
-
-                    for divide_op in divides_in_tree {
-                        let divide_expression = divide_op.expression().unwrap();
-                        match divide_expression {
-                            Expression::Divide(loc, _numerator, denominator) => {
-                                if let Expression::Variable(Identifier { name, .. }) = *denominator
-                                {
-                                    return DivideCheckReturn {
-                                        detected: params.contains(&name),
-                                        loc,
-                                    };
-                                }
-                            }
-                            _ => (),
-                        }
-                    }
-                }
-            }
+    for (_, parameter) in &def.params {
+        if let Some(Parameter {
+            name: Some(Identifier { name, .. }),
+            ..
+        }) = parameter
+        {
+            params.push(name.to_string());
         }
-        _ => (),
     }
 
-    return DivideCheckReturn {
-        detected: false,
-        loc: Loc::Builtin,
-    };
-}
+    if let Some(Statement::Block {
+        loc: _,
+        unchecked: _,
+        statements,
+    }) = &def.body
+    {
+        for function_body_members in statements {
+            let divides_in_tree =
+                extract_target_from_node(Target::Divide, function_body_members.clone().into());
 
-fn divides_by_parameter1(contract_part: SourceUnitPart) -> DivideCheckReturn {
-    let mut params: Vec<String> = vec![];
-    match contract_part {
-        SourceUnitPart::FunctionDefinition(def) => {
-            for (_, parameter) in &def.params {
-                if let Some(Parameter {
-                    name: Some(Identifier { name, .. }),
-                    ..
-                }) = parameter
-                {
-                    params.push(name.to_string());
-                }
-            }
-
-            if let Some(Statement::Block {
-                loc: _,
-                unchecked: _,
-                statements,
-            }) = &def.body
-            {
-                for function_body_members in statements {
-                    let divides_in_tree = extract_target_from_node(
-                        Target::Divide,
-                        function_body_members.clone().into(),
-                    );
-
-                    for divide_op in divides_in_tree {
-                        let divide_expression = divide_op.expression().unwrap();
-                        match divide_expression {
-                            Expression::Divide(loc, _numerator, denominator) => {
-                                if let Expression::Variable(Identifier { name, .. }) = *denominator
-                                {
-                                    return DivideCheckReturn {
-                                        detected: params.contains(&name),
-                                        loc,
-                                    };
-                                }
-                            }
-                            _ => (),
+            for divide_op in divides_in_tree {
+                let divide_expression = divide_op.expression().unwrap();
+                match divide_expression {
+                    Expression::Divide(loc, _numerator, denominator) => {
+                        if let Expression::Variable(Identifier { name, .. }) = *denominator {
+                            return DivideCheckReturn {
+                                detected: params.contains(&name),
+                                loc,
+                            };
                         }
                     }
+                    _ => (),
                 }
             }
         }
-        _ => (),
     }
 
     return DivideCheckReturn {
