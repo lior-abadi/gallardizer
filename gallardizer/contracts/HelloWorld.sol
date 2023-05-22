@@ -9,7 +9,16 @@ contract HelloWorld {
     }
 
     function test2(uint256 c, uint256 d) external returns (uint256) {
+        _check(d);
         return c / d;
+    }
+
+    function test3(uint256 f, uint256 g) external returns (uint256) {
+        return f / g;
+    }
+
+    function _check(uint256 denomintator) internal {
+        require(denomintator != 0);
     }
 
     // modifier nonReentrant() {

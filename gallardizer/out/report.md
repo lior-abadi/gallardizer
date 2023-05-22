@@ -14,10 +14,10 @@ Total: 4 instances over 2 issues
 | [L-1] | Potential precision loss from division with large numbers | 8 |
 | [L-2] | Insecure declaration of <code>pragma</code> version | 2 |
 | [L-3] | Denial of service risk from unbounded for-loops with external calls | 5 |
-| [L-4] | Reversals due to division by zero | 6 |
+| [L-4] | Reversals due to division by zero | 5 |
 
 
-Total: 21 instances over 4 issues
+Total: 20 instances over 4 issues
 
 ## Non-Critical Issues
 | |Issue|Instances|
@@ -37,7 +37,7 @@ Total: 10 instances over 2 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 42 instances over 9 issues, potentially saving over 350 gas units**
+**Total: 41 instances over 9 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -251,7 +251,7 @@ which could result in the function reverting if zero is passed as an argument. I
 safeguards against such division by zero errors to prevent unexpected function reverts and maintain the 
 integrity of each contract's calculations.
 
-*This issue was found 6 times:*
+*This issue was found 5 times:*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
@@ -264,16 +264,6 @@ File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
-
-
-```solidity
-File: ./ajna-core/src/libraries/internal/Loans.sol
-
-114:                    borrower_.t0Np = (1e18 + poolRate_) * curMomp * t0ThresholdPrice / lup_ / 1e18;
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
 
 
 ```solidity

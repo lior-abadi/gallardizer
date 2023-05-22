@@ -105,7 +105,12 @@ fn has_require_statements(def: &Box<FunctionDefinition>) -> bool {
                 if let Expression::FunctionCall(_, body, _) = call_expression {
                     match *body {
                         Expression::Variable(identifier) => {
-                            return identifier.name == "require";
+                            // The following condition is ideal
+                            // return identifier.name == "require";
+
+                            // However, it fails to detect internal calls where checks might be done
+                            // To reduce false positives, we stick only with those fns that don't have any call
+                            return true;
                         }
                         _ => (),
                     }
