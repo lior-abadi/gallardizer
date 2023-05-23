@@ -33,7 +33,12 @@ impl Detector for CentralizationRisk {
                                 let IdentifierPath { identifiers, .. } = &base.name;
 
                                 for identifier in identifiers {
-                                    if identifier.name.contains("onlyOwner") {
+                                    let modifier_name = identifier.name.to_lowercase();
+                                    if modifier_name.contains("owner")
+                                        || modifier_name.contains("only")
+                                        || modifier_name.contains("auth")
+                                        || modifier_name.contains("allow")
+                                    {
                                         self.detected_issues
                                             .push(get_appearance_metadata(&loc, parsed_file));
                                     }
@@ -58,14 +63,12 @@ impl Detector for CentralizationRisk {
     fn get_metadata(&self) -> IssueMetadata {
         let metadata: IssueMetadata = IssueMetadata {
             severity: Severities::M,
-            title: indoc! {"Single point of failure due to centralization risk"}.to_string(),
+            title: indoc! {"Excess of trust required due to centralization risks"}.to_string(),
             content: indoc! {
-            "The presence of a single account as the sole owner of a contract presents centralization risks and introduces a 
-            single point of failure. This setup leaves the contract vulnerable to loss, theft, or unavailability of the 
-            private key (if the owner is an external owned account). To mitigate these risks, consider transitioning to a 
-            multi-signature setup or adopting a role-based authorization model, segregating roles and their privileges as a 
-            part of a defense in depth strategy. This way, responsibilities and powers can be distributed, enhancing security, 
-            reducing centralization, and providing robust protection against potential adversarial events."}.to_string(),
+            "The existence of contract owners with administrative privileges can introduce a single 
+            point of failure due to the inherent centralization risk. These privileged owners are entrusted 
+            not to execute harmful updates or illicitly withdraw funds, emphasizing the need for trustworthiness 
+            in these roles to maintain the security and integrity of the contract's operation."}.to_string(),
             gas_saved_per_instance: 0,
         };
 

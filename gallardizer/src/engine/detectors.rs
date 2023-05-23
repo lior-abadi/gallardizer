@@ -5,7 +5,9 @@ use self::{
         require_instead_of_assert,
     },
     Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721, solmate_safetransfer},
-    NonCritical::{reentrancy_modifier_precedence, revert_strings, scientific_notation},
+    NonCritical::{
+        missing_indexed_fields, reentrancy_modifier_precedence, revert_strings, scientific_notation,
+    },
 };
 
 use super::report_generator::{
@@ -68,6 +70,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
         }),
         /* ==== GAS ==== */
         Box::new(use_custom_errors::CustomErrorsInsteadOfRevertStrings {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(missing_indexed_fields::MissingIndexedFields {
             detected_issues: Vec::new(),
         }),
         /* Add more detector modules */

@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
-// compiler version must be greater than or equal to 0.8.17 and less than 0.9.0
-import "solmate/utils/SafeTransferLib.sol";
-
 pragma solidity 0.8.17;
 
 contract HelloWorld {
+    event Testing(uint256 rojo, address azul, bytes32 amarillo, uint8 indexed verde);
+
     // modifier nonReentrant() {
     //     _;
     // }
@@ -17,15 +16,15 @@ contract HelloWorld {
     //     _;
     // }
 
-    function test(uint256 a, uint256 b) external returns (uint256) {
-        revert();
-        revert("Someting");
-        require(a != b, "perro");
-        require(a != b);
+    // function test(uint256 a, uint256 b) external authorized returns (uint256) {
+    //     revert();
+    //     revert("Someting");
+    //     require(a != b, "perro");
+    //     require(a != b);
 
-        manuelito(a != 0);
-        return a / b;
-    }
+    //     manuelito(a != 0);
+    //     return a / b;
+    // }
 
     // function test2(uint256 c, uint256 d) external returns (uint256) {
     //     _check(d);
