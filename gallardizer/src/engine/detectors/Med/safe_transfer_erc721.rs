@@ -38,12 +38,13 @@ impl Detector for SafeTransferERC721 {
 
             for node in target_nodes {
                 // MemberAccess is an expression
-                let expression = node.expression().unwrap();
-
-                if let Expression::MemberAccess(loc, _, identifier) = expression {
-                    if identifier.name == "transferFrom" {
-                        self.detected_issues
-                            .push(get_appearance_metadata(&loc, parsed_file));
+                let some_expression = node.expression();
+                if let Some(expression) = some_expression {
+                    if let Expression::MemberAccess(loc, _, identifier) = expression {
+                        if identifier.name == "transferFrom" {
+                            self.detected_issues
+                                .push(get_appearance_metadata(&loc, parsed_file));
+                        }
                     }
                 }
             }

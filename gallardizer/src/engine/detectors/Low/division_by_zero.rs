@@ -101,18 +101,20 @@ fn has_require_statements(def: &Box<FunctionDefinition>) -> bool {
             );
 
             for function_call in function_calls {
-                let call_expression = function_call.expression().unwrap();
-                if let Expression::FunctionCall(_, body, _) = call_expression {
-                    match *body {
-                        Expression::Variable(_identifier) => {
-                            // The following condition is ideal
-                            // return identifier.name == "require";
+                let some_call_expression = function_call.expression();
+                if let Some(call_expression) = some_call_expression {
+                    if let Expression::FunctionCall(_, body, _) = call_expression {
+                        match *body {
+                            Expression::Variable(_identifier) => {
+                                // The following condition is ideal
+                                // return identifier.name == "require";
 
-                            // However, it fails to detect internal calls where checks might be done
-                            // To reduce false positives, we stick only with those fns that don't have any call
-                            return true;
+                                // However, it fails to detect internal calls where checks might be done
+                                // To reduce false positives, we stick only with those fns that don't have any call
+                                return true;
+                            }
+                            _ => (),
                         }
-                        _ => (),
                     }
                 }
             }
@@ -150,17 +152,19 @@ fn divides_by_parameter(def: &Box<FunctionDefinition>) -> DivideCheckReturn {
                 extract_target_from_node(Target::Divide, function_body_members.clone().into());
 
             for divide_op in divides_in_tree {
-                let divide_expression = divide_op.expression().unwrap();
-                match divide_expression {
-                    Expression::Divide(loc, _numerator, denominator) => {
-                        if let Expression::Variable(Identifier { name, .. }) = *denominator {
-                            return DivideCheckReturn {
-                                detected: params.contains(&name),
-                                loc,
-                            };
+                let some_divide_expression = divide_op.expression();
+                if let Some(divide_expression) = some_divide_expression {
+                    match divide_expression {
+                        Expression::Divide(loc, _numerator, denominator) => {
+                            if let Expression::Variable(Identifier { name, .. }) = *denominator {
+                                return DivideCheckReturn {
+                                    detected: params.contains(&name),
+                                    loc,
+                                };
+                            }
                         }
+                        _ => (),
                     }
-                    _ => (),
                 }
             }
         }

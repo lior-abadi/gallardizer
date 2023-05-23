@@ -18,16 +18,18 @@ impl Detector for RequireInsteadOfAssert {
         );
 
         for function_call in function_calls {
-            let call_expression = function_call.expression().unwrap();
-            if let Expression::FunctionCall(loc, body, _) = call_expression {
-                match *body {
-                    Expression::Variable(identifier) => {
-                        if identifier.name == "assert" {
-                            self.detected_issues
-                                .push(get_appearance_metadata(&loc, parsed_file));
+            let some_call_expression = function_call.expression();
+            if let Some(call_expression) = some_call_expression {
+                if let Expression::FunctionCall(loc, body, _) = call_expression {
+                    match *body {
+                        Expression::Variable(identifier) => {
+                            if identifier.name == "assert" {
+                                self.detected_issues
+                                    .push(get_appearance_metadata(&loc, parsed_file));
+                            }
                         }
+                        _ => (),
                     }
-                    _ => (),
                 }
             }
         }
