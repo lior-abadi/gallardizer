@@ -4,7 +4,7 @@ use self::{
         division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version,
         require_instead_of_assert,
     },
-    Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721},
+    Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721, solmate_safetransfer},
     NonCritical::{reentrancy_modifier_precedence, revert_strings, scientific_notation},
 };
 
@@ -33,6 +33,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(centralization_risk::CentralizationRisk {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(solmate_safetransfer::SolmateSafeTransfer {
             detected_issues: Vec::new(),
         }),
         /* ==== LOW ==== */
