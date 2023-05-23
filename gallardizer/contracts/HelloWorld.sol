@@ -17,7 +17,7 @@ contract HelloWorld {
     //     _;
     // }
 
-    function test(uint256 a, uint256 b) external returns (uint256) {
+    function test(uint256 a, uint256 b) external authorized returns (uint256) {
         revert();
         revert("Someting");
         require(a != b, "perro");
