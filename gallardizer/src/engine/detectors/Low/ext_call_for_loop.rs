@@ -21,17 +21,18 @@ impl Detector for ExternalCallInsideForLoopDoS {
             let mut cached_less_loc: Loc = Loc::File(0, 0, 0);
 
             for part in member_calls {
-                let for_loop_less = part.clone().expression().unwrap();
-
-                match for_loop_less {
-                    Expression::Less(loc, _right_hand, left_hand) => {
-                        cached_less_loc = loc;
-                        if let Expression::MemberAccess(_, _, identifier) = *left_hand {
-                            detected_unbound_length = &identifier.name == "length";
+                let some_for_loop_less = part.clone().expression();
+                if let Some(for_loop_less) = some_for_loop_less {
+                    match for_loop_less {
+                        Expression::Less(loc, _right_hand, left_hand) => {
+                            cached_less_loc = loc;
+                            if let Expression::MemberAccess(_, _, identifier) = *left_hand {
+                                detected_unbound_length = &identifier.name == "length";
+                            }
                         }
-                    }
 
-                    _ => (),
+                        _ => (),
+                    }
                 }
             }
 
@@ -42,18 +43,19 @@ impl Detector for ExternalCallInsideForLoopDoS {
 
             let external_calls = extract_target_from_node(Target::FunctionCall, for_loop);
             for function_call in external_calls {
-                let calls = function_call.clone().expression().unwrap();
-
-                match &calls {
-                    Expression::FunctionCall(_loc, expr, _params) => {
-                        if let Expression::MemberAccess(_, _, _) = **expr {
-                            let issue_appearance =
-                                get_appearance_metadata(&cached_less_loc, parsed_file);
-                            self.detected_issues.push(issue_appearance);
+                let some_calls = function_call.clone().expression();
+                if let Some(calls) = some_calls {
+                    match &calls {
+                        Expression::FunctionCall(_loc, expr, _params) => {
+                            if let Expression::MemberAccess(_, _, _) = **expr {
+                                let issue_appearance =
+                                    get_appearance_metadata(&cached_less_loc, parsed_file);
+                                self.detected_issues.push(issue_appearance);
+                            }
                         }
-                    }
 
-                    _ => (),
+                        _ => (),
+                    }
                 }
             }
         }

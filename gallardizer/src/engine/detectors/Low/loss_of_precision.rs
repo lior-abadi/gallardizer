@@ -14,30 +14,31 @@ impl Detector for LossOfPrecision {
             extract_target_from_node(Target::Divide, parsed_file.parsed_ast_tree.clone().into());
 
         for node in target_nodes {
-            let expression = node.expression().unwrap();
+            let some_expression = node.expression();
+            if let Some(expression) = some_expression {
+                match expression {
+                    Expression::Divide(loc, _numerator, nominator) => match *nominator {
+                        Expression::NumberLiteral(_, base, exp, _) => {
+                            let mut exp_value: u32 = 0;
+                            let base_value: u128;
+                            let base_ten: u128 = 10;
 
-            match expression {
-                Expression::Divide(loc, _numerator, nominator) => match *nominator {
-                    Expression::NumberLiteral(_, base, exp, _) => {
-                        let mut exp_value: u32 = 0;
-                        let base_value: u128;
-                        let base_ten: u128 = 10;
+                            if exp.len() > 0 {
+                                exp_value = exp.parse::<u32>().unwrap();
+                            }
 
-                        if exp.len() > 0 {
-                            exp_value = exp.parse::<u32>().unwrap();
+                            base_value = base.parse::<u128>().unwrap();
+                            let numerator_value = base_value * base_ten.pow(exp_value);
+
+                            if numerator_value > base_ten.pow(4) {
+                                let issue_appearance = get_appearance_metadata(&loc, parsed_file);
+                                self.detected_issues.push(issue_appearance);
+                            }
                         }
-
-                        base_value = base.parse::<u128>().unwrap();
-                        let numerator_value = base_value * base_ten.pow(exp_value);
-
-                        if numerator_value > base_ten.pow(4) {
-                            let issue_appearance = get_appearance_metadata(&loc, parsed_file);
-                            self.detected_issues.push(issue_appearance);
-                        }
-                    }
+                        _ => (),
+                    },
                     _ => (),
-                },
-                _ => (),
+                }
             }
         }
     }

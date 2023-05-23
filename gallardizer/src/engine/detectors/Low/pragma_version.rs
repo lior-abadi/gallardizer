@@ -14,14 +14,15 @@ impl Detector for PragmaVersionDetector {
         for part in &parsed_file.parsed_ast_tree.0 {
             match part {
                 SourceUnitPart::PragmaDirective(loc, _opt, _opt_lit) => {
-                    let pragma_version = _opt_lit.as_ref().map(|s| s.string.clone()).unwrap();
+                    if let Some(pragma_literal) = _opt_lit {
+                        let pragma_version = &pragma_literal.string;
+                        let detected: bool = check_floating_pragma(&pragma_version)
+                            || check_pragma_version(&pragma_version);
 
-                    let detected: bool = check_floating_pragma(&pragma_version)
-                        || check_pragma_version(&pragma_version);
-
-                    if detected {
-                        let issue_appearance = get_appearance_metadata(loc, parsed_file);
-                        self.detected_issues.push(issue_appearance);
+                        if detected {
+                            self.detected_issues
+                                .push(get_appearance_metadata(&loc, parsed_file));
+                        }
                     }
                 }
                 _ => (),
@@ -43,7 +44,7 @@ impl Detector for PragmaVersionDetector {
             content: indoc! {
             " The utilization of a flexible pragma version could introduce a variety of potential risks to your contract, 
             accommodating a range of compiler versions which may lack support for specific improvements and changes such as 
-            those found in <code>0.8.8</code>'s <code>override</code> modifier or <code>0.8.11</code>'s <code>abi.encodeCall</code>.<br>
+            <code>0.8.11</code>'s <code>abi.encodeCall</code>.<br>
 
             Without singling out these features as definitive concerns, it's important to acknowledge the broad 
             spectrum of unexpected complications that could occur. A recommendation would be to align with a fixed, 
@@ -64,7 +65,7 @@ fn check_floating_pragma(content: &str) -> bool {
 fn check_pragma_version(content: &str) -> bool {
     let parts: Vec<&str> = content.split('.').collect();
 
-    // We ensure that the pragma format is X.Y.Z (e.g. 0.8.9)
+    // We ensure that the pragma format is X.Y.Z (e.g. 0.8.11)
     if parts.len() >= 3 {
         if let (Some(second), Some(last)) =
             (parts[1].parse::<u32>().ok(), parts[2].parse::<u32>().ok())

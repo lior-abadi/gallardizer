@@ -23,57 +23,60 @@ impl Detector for RevertStrings {
 
         // Require Handling
         for function_call in function_calls {
-            let call_expression = function_call.expression().unwrap();
-
-            let mut has_require_strings: bool = false;
-            // Here we evaluate the require statements for each function
-            if let Expression::FunctionCall(loc, body, parameters) = call_expression {
-                match *body {
-                    Expression::Variable(identifier) => {
-                        if identifier.name == "require" {
-                            for parameter in parameters {
-                                match parameter {
-                                    Expression::StringLiteral(_lit) => {
-                                        // If enters here, means that has a revert string
-                                        has_require_strings = true;
+            let some_call_expression = function_call.expression();
+            if let Some(call_expression) = some_call_expression {
+                let mut has_require_strings: bool = false;
+                // Here we evaluate the require statements for each function
+                if let Expression::FunctionCall(loc, body, parameters) = call_expression {
+                    match *body {
+                        Expression::Variable(identifier) => {
+                            if identifier.name == "require" {
+                                for parameter in parameters {
+                                    match parameter {
+                                        Expression::StringLiteral(_lit) => {
+                                            // If enters here, means that has a revert string
+                                            has_require_strings = true;
+                                        }
+                                        _ => (),
                                     }
-                                    _ => (),
+                                }
+                                if !has_require_strings {
+                                    self.detected_issues
+                                        .push(get_appearance_metadata(&loc, parsed_file));
                                 }
                             }
-                            if !has_require_strings {
-                                self.detected_issues
-                                    .push(get_appearance_metadata(&loc, parsed_file));
-                            }
                         }
+                        _ => (),
                     }
-                    _ => (),
                 }
             }
         }
 
         // Revert handling
         for revert in reverts {
-            let statement = revert.statement().unwrap();
-            let mut has_revert_strings: bool = false;
-            if let Statement::Revert(loc, identifier, expressions) = statement {
-                // We filter reverts triggered with custom errors
-                if let Some(_path) = identifier {
-                    continue;
-                }
-
-                // If we've reached this level, means that the revert found is not a custom error
-                for expression in expressions {
-                    match expression {
-                        Expression::StringLiteral(_lit) => {
-                            // If enters here, means that has a revert string
-                            has_revert_strings = true;
-                        }
-                        _ => (),
+            let some_statement = revert.statement();
+            if let Some(statement) = some_statement {
+                let mut has_revert_strings: bool = false;
+                if let Statement::Revert(loc, identifier, expressions) = statement {
+                    // We filter reverts triggered with custom errors
+                    if let Some(_path) = identifier {
+                        continue;
                     }
-                }
-                if !has_revert_strings {
-                    self.detected_issues
-                        .push(get_appearance_metadata(&loc, parsed_file));
+
+                    // If we've reached this level, means that the revert found is not a custom error
+                    for expression in expressions {
+                        match expression {
+                            Expression::StringLiteral(_lit) => {
+                                // If enters here, means that has a revert string
+                                has_revert_strings = true;
+                            }
+                            _ => (),
+                        }
+                    }
+                    if !has_revert_strings {
+                        self.detected_issues
+                            .push(get_appearance_metadata(&loc, parsed_file));
+                    }
                 }
             }
         }

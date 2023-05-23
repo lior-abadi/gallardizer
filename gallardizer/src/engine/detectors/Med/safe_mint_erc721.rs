@@ -34,13 +34,14 @@ impl Detector for SafeMintERC721 {
 
             for node in target_nodes {
                 // FunctionCall is an expression
-                let expression = node.expression().unwrap();
-
-                if let Expression::FunctionCall(loc, selector, _params) = expression {
-                    if let Expression::Variable(identifier) = *selector {
-                        if identifier.name == "_mint" {
-                            self.detected_issues
-                                .push(get_appearance_metadata(&loc, parsed_file));
+                let some_expression = node.expression();
+                if let Some(expression) = some_expression {
+                    if let Expression::FunctionCall(loc, selector, _params) = expression {
+                        if let Expression::Variable(identifier) = *selector {
+                            if identifier.name == "_mint" {
+                                self.detected_issues
+                                    .push(get_appearance_metadata(&loc, parsed_file));
+                            }
                         }
                     }
                 }
