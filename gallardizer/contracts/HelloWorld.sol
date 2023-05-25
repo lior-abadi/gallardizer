@@ -4,6 +4,22 @@ pragma solidity 0.8.17;
 contract HelloWorld {
     event Testing(uint256 rojo, address azul, bytes32 amarillo, uint8 indexed verde);
 
+    function _execute(
+        uint256 proposalId_,
+        address[] memory targets_,
+        uint256[] memory values_,
+        bytes[] memory calldatas_
+    ) internal {
+        // use common event name to maintain consistency with tally
+        emit ProposalExecuted(proposalId_);
+
+        string memory errorMessage = "Governor: call reverted without message";
+        for (uint256 i = 0; i < targets_.length; ++i) {
+            (bool success, bytes memory returndata) = targets_[i].call{value: values_[i]}(calldatas_[i]);
+            Address.verifyCallResult(success, returndata, errorMessage);
+        }
+    }
+
     // modifier nonReentrant() {
     //     _;
     // }

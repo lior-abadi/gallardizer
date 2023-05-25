@@ -4,9 +4,7 @@ use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
-use solang_parser::pt::{
-    ContractPart, EventDefinition, FunctionAttribute, IdentifierPath, SourceUnitPart,
-};
+use solang_parser::pt::{ContractPart, EventDefinition, SourceUnitPart};
 
 pub struct MissingIndexedFields {
     pub detected_issues: Vec<IssueAppearance>,
