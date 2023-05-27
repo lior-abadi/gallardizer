@@ -1,15 +1,3 @@
-use self::{
-    Gas::use_custom_errors,
-    Low::{
-        division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version,
-        require_instead_of_assert, unchecked_array_length,
-    },
-    Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721, solmate_safetransfer},
-    NonCritical::{
-        missing_indexed_fields, reentrancy_modifier_precedence, revert_strings, scientific_notation,
-    },
-};
-
 use super::report_generator::{
     generate_report_locally, get_line_content, get_line_number, AppearanceMetadata, Issue,
     IssueAppearance, IssueMetadata,
@@ -23,63 +11,6 @@ pub trait Detector {
     fn get_detector_name(&self) -> String;
     fn get_metadata(&self) -> IssueMetadata;
     fn get_detected_issues(&self) -> Vec<IssueAppearance>;
-}
-
-fn get_all_detectors() -> Vec<Box<dyn Detector>> {
-    return vec![
-        /* ==== MED ==== */
-        Box::new(safe_mint_erc721::SafeMintERC721 {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(safe_transfer_erc721::SafeTransferERC721 {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(centralization_risk::CentralizationRisk {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(solmate_safetransfer::SolmateSafeTransfer {
-            detected_issues: Vec::new(),
-        }),
-        /* ==== LOW ==== */
-        Box::new(loss_of_precision::LossOfPrecision {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(pragma_version::PragmaVersionDetector {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(ext_call_for_loop::ExternalCallInsideForLoopDoS {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(require_instead_of_assert::RequireInsteadOfAssert {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(division_by_zero::DivisionByZero {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(unchecked_array_length::UncheckedArrayLength {
-            detected_issues: Vec::new(),
-        }),
-        /* ==== NC ==== */
-        Box::new(
-            reentrancy_modifier_precedence::ReentrancyModifierPrecedence {
-                detected_issues: Vec::new(),
-            },
-        ),
-        Box::new(scientific_notation::ScientificNotation {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(revert_strings::RevertStrings {
-            detected_issues: Vec::new(),
-        }),
-        /* ==== GAS ==== */
-        Box::new(use_custom_errors::CustomErrorsInsteadOfRevertStrings {
-            detected_issues: Vec::new(),
-        }),
-        Box::new(missing_indexed_fields::MissingIndexedFields {
-            detected_issues: Vec::new(),
-        }),
-        /* Add more detector modules */
-    ];
 }
 
 pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
@@ -194,3 +125,76 @@ pub mod High;
 pub mod Low;
 pub mod Med;
 pub mod NonCritical;
+
+use self::{
+    Gas::use_custom_errors,
+    Low::{
+        division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version,
+        require_instead_of_assert, unchecked_array_length,
+    },
+    Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721, solmate_safetransfer},
+    NonCritical::{
+        magic_numbers, missing_indexed_fields, reentrancy_modifier_precedence, revert_strings,
+        scientific_notation,
+    },
+};
+
+fn get_all_detectors() -> Vec<Box<dyn Detector>> {
+    return vec![
+        /* ==== MED ==== */
+        Box::new(safe_mint_erc721::SafeMintERC721 {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(safe_transfer_erc721::SafeTransferERC721 {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(centralization_risk::CentralizationRisk {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(solmate_safetransfer::SolmateSafeTransfer {
+            detected_issues: Vec::new(),
+        }),
+        /* ==== LOW ==== */
+        Box::new(loss_of_precision::LossOfPrecision {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(pragma_version::PragmaVersionDetector {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(ext_call_for_loop::ExternalCallInsideForLoopDoS {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(require_instead_of_assert::RequireInsteadOfAssert {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(division_by_zero::DivisionByZero {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(unchecked_array_length::UncheckedArrayLength {
+            detected_issues: Vec::new(),
+        }),
+        /* ==== NC ==== */
+        Box::new(
+            reentrancy_modifier_precedence::ReentrancyModifierPrecedence {
+                detected_issues: Vec::new(),
+            },
+        ),
+        Box::new(scientific_notation::ScientificNotation {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(revert_strings::RevertStrings {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(magic_numbers::MagicNumbers {
+            detected_issues: Vec::new(),
+        }),
+        /* ==== GAS ==== */
+        Box::new(use_custom_errors::CustomErrorsInsteadOfRevertStrings {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(missing_indexed_fields::MissingIndexedFields {
+            detected_issues: Vec::new(),
+        }),
+        /* Add more detector modules */
+    ];
+}

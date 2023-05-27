@@ -26,10 +26,11 @@ Total: 23 instances over 5 issues
 | [NC-1] | The <code>nonReentrant</code> modifier should precede all other modifiers | 1 |
 | [NC-2] | Prefer scientific notation over exponentiation | 9 |
 | [NC-3] | Add descriptive revert reasons | 1 |
-| [NC-4] | Inadequate indexing of event fields | 65 |
+| [NC-4] | Avoid using magic numbers | 61 |
+| [NC-5] | Inadequate indexing of event fields | 65 |
 
 
-Total: 76 instances over 4 issues
+Total: 137 instances over 5 issues
 
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
@@ -40,7 +41,7 @@ Total: 76 instances over 4 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 110 instances over 12 issues, potentially saving over 350 gas units**
+**Total: 171 instances over 13 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -438,7 +439,317 @@ File: ./ajna-core/src/PositionManager.sol
 
 
 
-## [NC-4] Inadequate indexing of event fields
+## [NC-4] Avoid using magic numbers
+It is recommended to define constants instead of relying on hex or numeric literals.
+This practice enhances readability and clarity, even in assembly context, 
+thereby mitigating the potential for confusion or error.
+
+*This issue was found 61 times:*
+
+```solidity
+File: ./ajna-core/src/ERC721PoolFactory.sol
+
+62:            try IERC165(collateral_).supportsInterface(0x80ac58cd) returns (bool supportsERC721Interface) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+
+
+```solidity
+File: ./ajna-core/src/PoolInfoUtils.sol
+
+254:            timeRemaining_              = 3 days - Maths.min(3 days, block.timestamp - auctionKickTime);
+
+
+254:            timeRemaining_              = 3 days - Maths.min(3 days, block.timestamp - auctionKickTime);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PoolInfoUtils.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PoolInfoUtils.sol)
+
+
+```solidity
+File: ./ajna-core/src/base/PermitERC721.sol
+
+59:                        0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
+
+
+103:                    IERC1271(owner).isValidSignature(digest, abi.encodePacked(r_, s_, v_)) == 0x1626ba7e,
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/KickerActions.sol
+
+277:            if (block.timestamp < lastBurnTimestamp + 2 weeks || block.timestamp - reserveAuction_.kicked <= 72 hours) {
+
+
+407:            vars.t0KickPenalty = Maths.wdiv(Maths.wmul(kickResult_.t0KickedDebt, poolState_.rate), 4 * 1e18);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/PoolCommons.sol
+
+180:            else if (block.timestamp - interestParams_.interestRateUpdate > 12 hours) {
+
+
+227:            uint256 pendingFactor = PRBMathUD60x18.exp((poolState_.rate * elapsed_) / 365 days);
+
+
+291:            if (4 * (tu - mau102) < (((tu + mau102 - 1e18) / 1e9) ** 2) - 1e18) {
+
+
+294:            } else if (4 * (tu - mau) > 1e18 - ((tu + mau - 1e18) ** 2) / 1e18) {
+
+
+299:            newInterestRate_ = Maths.min(500 * 1e18, Maths.max(0.001 * 1e18, newInterestRate_));
+
+
+331:            uint256 base = 1_000_000 * 1e18 - Maths.wmul(Maths.min(mau_, 1e18), 1_000_000 * 1e18);
+
+
+331:            uint256 base = 1_000_000 * 1e18 - Maths.wmul(Maths.min(mau_, 1e18), 1_000_000 * 1e18);
+
+
+384:            return PRBMathUD60x18.exp((interestRate_ * elapsed_) / 365 days);
+
+
+401:                PRBMathUD60x18.exp((interestRate_ * (block.timestamp - inflatorUpdate)) / 365 days)
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/PositionNFTSVG.sol
+
+40:            string memory ownerHexString = (uint256(uint160(params_.owner))).toHexString(20);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PositionNFTSVG.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PositionNFTSVG.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/SettlerActions.sol
+
+112:            if ((block.timestamp - kickTime < 72 hours) && (borrower.collateral != 0)) revert AuctionNotClearable();
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/TakerActions.sol
+
+288:            if (kicked != 0 && block.timestamp - kicked <= 72 hours) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
+
+82:                return uint256(4157 - PRBMathSD59x18.toInt(ceilIndex));
+
+
+84:            return uint256(4156 - PRBMathSD59x18.toInt(ceilIndex));
+
+
+116:            return Maths.max(Maths.wdiv(interestRate_, 52 * 1e18), 0.0005 * 1e18);
+
+
+128:            return Maths.wdiv(interestRate_, 365 * 1e18);
+
+
+178:            if (bucketIndex_ > 3900) {
+
+
+179:                int256 bucketOffset = int256(bucketIndex_ - 3900);
+
+
+180:                int256 result = PRBMathSD59x18.sqrt(PRBMathSD59x18.div(bucketOffset * 1e18, int256(36 * 1e18)));
+
+
+304:                uint256 hoursComponent   = 1e27 >> secondsElapsed / 3600;
+
+
+305:                uint256 minutesComponent = Maths.rpow(MINUTE_HALF_LIFE, secondsElapsed % 3600 / 60);
+
+
+305:                uint256 minutesComponent = Maths.rpow(MINUTE_HALF_LIFE, secondsElapsed % 3600 / 60);
+
+
+307:                price_ = Maths.rayToWad(1_000_000_000 * Maths.rmul(hoursComponent, minutesComponent));
+
+
+334:            price_ = 32 * Maths.wmul(referencePrice, uint256(PRBMathSD59x18.exp2(timeAdjustment)));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/RevertsHelper.sol
+
+57:                if (block.timestamp - kickTime > 72 hours) revert AuctionNotCleared();
+
+
+107:                if (loansCount >= 10)
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
+
+15:            symbol_ = _callAndParseStringReturn(token, 0x95d89b41);
+
+
+18:                return _toAsciiString(token, 6);
+
+
+25:            name_ = _callAndParseStringReturn(token, 0x06fdde03);
+
+
+28:                return _toAsciiString(token, 40);
+
+
+44:            if (data.length == 32) {
+
+
+47:            } else if (data.length > 64) {
+
+
+58:            bytes memory bytesString = new bytes(32);
+
+
+60:            for (uint256 j = 0; j < 32; j++) {
+
+
+76:            require(len % 2 == 0 && len > 0 && len <= 40, 'SafeERC20Namer: INVALID_LEN');
+
+
+82:                uint8 b = uint8(addrNum >> (8 * (19 - i)));
+
+
+82:                uint8 b = uint8(addrNum >> (8 * (19 - i)));
+
+
+84:                uint8 hi = b >> 4;
+
+
+86:                uint8 lo = b - (hi << 4);
+
+
+97:            if (b < 10) {
+
+
+98:                return bytes1(b + 0x30);
+
+
+100:                return bytes1(b + 0x37);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Deposits.sol
+
+82:            uint256 i  = 4096; // 1 << (_numBits - 1) = 1 << (13 - 1) = 4096
+
+
+148:                lsb_ = i_ & ((i_ ^ 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff) + 1);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Deposits.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Deposits.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/Funding.sol
+
+125:                if (selector != bytes4(0xa9059cbb)) revert InvalidProposal();
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/StandardFunding.sol
+
+292:            ) / 10;
+
+
+391:            if (newProposal.tokensRequested > (currentDistribution.fundsAvailable * 9 / 10)) revert InvalidProposal();
+
+
+391:            if (newProposal.tokensRequested > (currentDistribution.fundsAvailable * 9 / 10)) revert InvalidProposal();
+
+
+448:                if (totalTokensRequested > (gbc * 9 / 10)) {
+
+
+448:                if (totalTokensRequested > (gbc * 9 / 10)) {
+
+
+719:            if (screenedProposalsLength < 10 && indexInArray == -1) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/libraries/Maths.sol
+
+19:            if (y > 3) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+
+
+```solidity
+File: ./ajna-grants/src/token/AjnaToken.sol
+
+13:            _mint(tokenReceiver_, 2_000_000_000 * 10 ** decimals());
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+
+
+```solidity
+File: ./ajna-grants/src/token/BurnWrapper.sol
+
+50:            return 18;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol)
+
+
+
+## [NC-5] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
 proving particularly beneficial for address-based filtering. However, gas costs increase with each 
 indexed field during emission, posing a challenge in maximizing the use of the allowable three fields per event. 

@@ -1,26 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-function _execute(uint256 proposalId_, address[] memory targets_, uint256[] memory values_, bytes[] memory calldatas_) {
-    // require(targets_.length == values_.length);
-    // require(targets_.length == calldatas_.length);
-
-    // assert(targets_.length == calldatas_.length);
-    // assert(targets_.length == values_.length);
-
-    // if (targets_.length != calldatas_.length) {
-    //     revert ErrorArrayMismatch();
-    // }
-
-    _checkArrayLengths(targets_.length, calldatas_.length);
-
-    string memory errorMessage = "Governor: call reverted without message";
-    for (uint256 i = 0; i < targets_.length; ++i) {
-        (bool success, bytes memory returndata) = targets_[i].call{value: values_[i]}(calldatas_[i]);
-        Address.verifyCallResult(success, returndata, errorMessage);
-    }
-}
-
 contract HelloWorld {
     event Testing(uint256 rojo, address azul, bytes32 amarillo, uint8 indexed verde);
 
@@ -36,15 +16,18 @@ contract HelloWorld {
     //     _;
     // }
 
-    // function test(uint256 a, uint256 b) external authorized returns (uint256) {
-    //     revert();
-    //     revert("Someting");
-    //     require(a != b, "perro");
-    //     require(a != b);
+    function test(uint256 a, uint256 b, bytes4 selector) external returns (uint256) {
+        // uint256 someCalc = a + 68;
+        // uint256 z = a % 2 != 0 ? b : 10 ** 18;
+        uint256 k = 100 / 24;
+        bool k1 = k > 0;
+        bool k1 = k > 1e18;
 
-    //     manuelito(a != 0);
-    //     return a / b;
-    // }
+        if (selector != bytes4(0xa9059cbb)) revert InvalidProposal();
+        // if (selector != bytes4(0x0)) revert InvalidProposal();
+
+        return a / b;
+    }
 
     // function test2(uint256 c, uint256 d) external returns (uint256) {
     //     _check(d);
