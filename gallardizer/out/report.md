@@ -15,9 +15,10 @@ Total: 4 instances over 2 issues
 | [L-2] | Insecure declaration of <code>pragma</code> version | 2 |
 | [L-3] | Denial of service risk from unbounded for-loops with external calls | 5 |
 | [L-4] | Reversals due to division by zero | 5 |
+| [L-5] | Absence of array length validation | 3 |
 
 
-Total: 20 instances over 4 issues
+Total: 23 instances over 5 issues
 
 ## Non-Critical Issues
 | |Issue|Instances|
@@ -39,7 +40,7 @@ Total: 76 instances over 4 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 107 instances over 11 issues, potentially saving over 350 gas units**
+**Total: 110 instances over 12 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -289,6 +290,52 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+
+
+
+## [L-5] Absence of array length validation
+Without explicit checks for arrays to have the same length, user operations 
+might not be completely executed. This is due to the disparity between the number of items 
+involved in the iteration and the number of items in the subsequent arrays.
+
+*This issue was found 3 times:*
+
+```solidity
+File: ./ajna-core/src/libraries/external/LPActions.sol
+
+55:        function increaseLPAllowance(
+56:            mapping(uint256 => uint256) storage allowances_,
+57:            address spender_,
+58:            uint256[] calldata indexes_,
+59:            uint256[] calldata amounts_
+60:        ) external {
+
+
+91:        function decreaseLPAllowance(
+92:            mapping(uint256 => uint256) storage allowances_,
+93:            address spender_,
+94:            uint256[] calldata indexes_,
+95:            uint256[] calldata amounts_
+96:        ) external {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/Funding.sol
+
+52:        function _execute(
+53:            uint256 proposalId_,
+54:            address[] memory targets_,
+55:            uint256[] memory values_,
+56:            bytes[] memory calldatas_
+57:        ) internal {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
 
 
 

@@ -10,8 +10,21 @@ contract HelloWorld {
         uint256[] memory values_,
         bytes[] memory calldatas_
     ) internal {
-        // use common event name to maintain consistency with tally
-        emit ProposalExecuted(proposalId_);
+        // require(targets_.length == values_.length);
+        // require(targets_.length == calldatas_.length);
+
+        // assert(targets_.length == calldatas_.length);
+        // assert(targets_.length == values_.length);
+
+        if (targets_.length != values_.length) {
+            revert ErrorArrayMismatch();
+        }
+
+        // if (targets_.length != calldatas_.length) {
+        //     revert ErrorArrayMismatch();
+        // }
+
+        _checkArrayLengths(targets_.length, calldatas_.length);
 
         string memory errorMessage = "Governor: call reverted without message";
         for (uint256 i = 0; i < targets_.length; ++i) {
