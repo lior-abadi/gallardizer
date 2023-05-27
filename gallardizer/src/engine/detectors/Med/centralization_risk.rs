@@ -21,9 +21,6 @@ impl Detector for CentralizationRisk {
             // Functions could be defined either inside a contract or outside
             let some_contract_part: Option<ContractPart> = node.clone().contract_part();
 
-            // Since functions defined outside contracts cannot have modifiers, we skip them.
-            // let some_source_part: Option<SourceUnitPart> = node.source_unit_part();
-
             if let Some(contract_part) = some_contract_part {
                 // FunctionDefinition is a contract part from now
                 if let ContractPart::FunctionDefinition(def) = contract_part {
