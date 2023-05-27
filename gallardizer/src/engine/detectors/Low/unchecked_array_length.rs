@@ -4,9 +4,7 @@ use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
-use solang_parser::pt::{
-    ContractPart, EventDefinition, Expression, FunctionDefinition, SourceUnitPart, Statement,
-};
+use solang_parser::pt::{ContractPart, Expression, FunctionDefinition, SourceUnitPart, Statement};
 
 pub struct UncheckedArrayLength {
     pub detected_issues: Vec<IssueAppearance>,
@@ -39,7 +37,7 @@ impl Detector for UncheckedArrayLength {
                         let uses_inputs_in_loop = has_for_loops_using_inputs(def, &array_inputs);
 
                         // We skip if no inputs are inside for loops
-                        if (!uses_inputs_in_loop) {
+                        if !uses_inputs_in_loop {
                             continue;
                         }
 
@@ -55,8 +53,6 @@ impl Detector for UncheckedArrayLength {
 
                         // Detection condition
                         if inputs_checked < array_inputs.len() {
-                            println!("DETECTED");
-
                             self.detected_issues
                                 .push(get_appearance_metadata(&def.loc, parsed_file));
                         }
@@ -67,12 +63,41 @@ impl Detector for UncheckedArrayLength {
 
             // Handle functions declared outside contracts
             if let Some(source_part) = some_source_part {
-                // if let SourceUnitPart::EventDefinition(event_definition) = source_part {
-                //     if has_non_indexed_field(&event_definition) {
-                //         self.detected_issues
-                //             .push(get_appearance_metadata(&event_definition.loc, parsed_file));
-                //     }
-                // }
+                match &source_part {
+                    SourceUnitPart::FunctionDefinition(def) => {
+                        let array_inputs = get_function_array_inputs(def);
+
+                        // To have an array len mismatch, there should be at least two
+                        if array_inputs.len() < 2 {
+                            continue;
+                        }
+
+                        // Check if there are for loops using those inputs
+                        let uses_inputs_in_loop = has_for_loops_using_inputs(def, &array_inputs);
+
+                        // We skip if no inputs are inside for loops
+                        if !uses_inputs_in_loop {
+                            continue;
+                        }
+
+                        // If we reached this point, it means that there are more than 2 inputs
+                        // And they are being used in a for loop
+                        // We need to scan if their lengths are checked at any point
+                        let mut inputs_checked: usize = 0; // checked need to be == array_inputs.len()
+                        for input in &array_inputs {
+                            if has_revert_checks(def, input) {
+                                inputs_checked += 1;
+                            }
+                        }
+
+                        // Detection condition
+                        if inputs_checked < array_inputs.len() {
+                            self.detected_issues
+                                .push(get_appearance_metadata(&def.loc, parsed_file));
+                        }
+                    }
+                    _ => (),
+                }
             }
         }
     }
@@ -168,6 +193,8 @@ fn has_for_loops_using_inputs(
 
 // Checks if the target variables are inside a statement that leads to a revert
 fn has_revert_checks(def: &Box<FunctionDefinition>, target_to_check: &str) -> bool {
+    let mut match_detected: bool = false;
+
     if let Some(Statement::Block {
         loc: _,
         unchecked: _,
@@ -185,16 +212,13 @@ fn has_revert_checks(def: &Box<FunctionDefinition>, target_to_check: &str) -> bo
             let if_statements =
                 extract_target_from_node(Target::If, function_body_members.clone().into());
 
-            let mut match_detected: bool = false;
-
-            // Handle Require and Assert
+            // Handle Require and Assert or internal function checks
             for function_call in function_calls {
                 let some_call_expression = function_call.expression();
                 if let Some(call_expression) = some_call_expression {
                     if let Expression::FunctionCall(_, body, expressions) = call_expression {
                         match *body {
-                            Expression::Variable(identifier) => {
-                                // The following condition is ideal
+                            Expression::Variable(_identifier) => {
                                 for expression in expressions {
                                     let member_access: Vec<Node> = extract_target_from_node(
                                         Target::MemberAccess,
@@ -218,7 +242,7 @@ fn has_revert_checks(def: &Box<FunctionDefinition>, target_to_check: &str) -> bo
                                                                     == var_identifier.name;
 
                                                                 // Early return as we already found the match
-                                                                if (match_detected) {
+                                                                if match_detected {
                                                                     return match_detected;
                                                                 }
                                                             }
@@ -237,6 +261,7 @@ fn has_revert_checks(def: &Box<FunctionDefinition>, target_to_check: &str) -> bo
                     }
                 }
             }
+
             // Handle if statements
             for if_statement_node in if_statements {
                 let some_if_statement = if_statement_node.statement();
@@ -262,7 +287,7 @@ fn has_revert_checks(def: &Box<FunctionDefinition>, target_to_check: &str) -> bo
                                                     target_to_check == var_identifier.name;
 
                                                 // Early return as we already found the match
-                                                if (match_detected) {
+                                                if match_detected {
                                                     return match_detected;
                                                 }
                                             }
@@ -278,7 +303,7 @@ fn has_revert_checks(def: &Box<FunctionDefinition>, target_to_check: &str) -> bo
             }
         }
     }
-    return false;
+    return match_detected;
 }
 
 fn get_variable_with_criteria(variables: Vec<Node>, target_to_check: &str) -> String {

@@ -4,7 +4,7 @@ use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
-use solang_parser::pt::{Expression, Loc, Statement};
+use solang_parser::pt::{Expression, Statement};
 
 pub struct RevertStrings {
     pub detected_issues: Vec<IssueAppearance>,
