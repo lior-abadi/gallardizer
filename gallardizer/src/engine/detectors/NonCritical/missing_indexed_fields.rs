@@ -71,7 +71,7 @@ impl Detector for MissingIndexedFields {
 }
 
 fn has_non_indexed_field(event_definition: &Box<EventDefinition>) -> bool {
-    let mut has_non_indexed_param: bool = false;
+    // let mut has_non_indexed_param: bool = false;
     let mut amount_of_indexed_fields: u16 = 0;
     for field in &event_definition.fields {
         if field.indexed {
@@ -80,9 +80,11 @@ fn has_non_indexed_field(event_definition: &Box<EventDefinition>) -> bool {
             continue;
         }
         // If we reach this point, means that we haven't entered the if branch (as it continues)
-        has_non_indexed_param = true;
+        // has_non_indexed_param = true;
     }
 
-    // If the event has at least one non indexed field and has less than 3, flag it.
-    return has_non_indexed_param && amount_of_indexed_fields < 3;
+    let amount_of_fields = &event_definition.fields.len();
+
+    // If the event has no indexed fields, return true
+    return amount_of_indexed_fields == 0 && amount_of_fields > &0;
 }

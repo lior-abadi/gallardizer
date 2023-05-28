@@ -28,10 +28,11 @@ Total: 23 instances over 5 issues
 | [NC-3] | Add descriptive revert reasons | 1 |
 | [NC-4] | Avoid using magic numbers | 61 |
 | [NC-5] | Time-related numeric values could employ time units | 3 |
-| [NC-6] | Inadequate indexing of event fields | 65 |
+| [NC-6] | Expressions defining constant values should employ `immutable` instead of `constant` | 4 |
+| [NC-7] | Inadequate indexing of event fields | 15 |
 
 
-Total: 140 instances over 6 issues
+Total: 94 instances over 7 issues
 
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
@@ -42,7 +43,7 @@ Total: 140 instances over 6 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 174 instances over 14 issues, potentially saving over 350 gas units**
+**Total: 128 instances over 15 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -752,7 +753,8 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 ## [NC-5] Time-related numeric values could employ time units
 For readability and consistency, numeric values associated with time should
-utilize predefined units like seconds, minutes, hours, days, or weeks..
+utilize predefined [units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#time-units) 
+like seconds, minutes, hours, days, or weeks.
 
 *This issue was found 3 times:*
 
@@ -773,7 +775,56 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 
 
-## [NC-6] Inadequate indexing of event fields
+## [NC-6] Expressions defining constant values should employ `immutable` instead of `constant`
+It's important to distinguish between `constant` and `immutable` variables, 
+using each in their appropriate situations. Constants are suitable for literal values 
+hard-coded into the contracts, while `immutables` should be used for expression-based values, such as a call to `keccak256()`, 
+or those calculated/introduced in the `constructor`.
+
+*This issue was found 4 times:*
+
+```solidity
+File: ./ajna-core/src/ERC20PoolFactory.sol
+
+28:        bytes32 public constant ERC20_NON_SUBSET_HASH = keccak256("ERC20_NON_SUBSET_HASH");
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol)
+
+
+```solidity
+File: ./ajna-core/src/ERC721PoolFactory.sol
+
+30:        bytes32 public constant ERC721_NON_SUBSET_HASH = keccak256("ERC721_NON_SUBSET_HASH");
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/ExtraordinaryFunding.sol
+
+28:        bytes32 internal constant DESCRIPTION_PREFIX_HASH_EXTRAORDINARY = keccak256(bytes("Extraordinary Funding: "));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/StandardFunding.sol
+
+51:        bytes32 internal constant DESCRIPTION_PREFIX_HASH_STANDARD = keccak256(bytes("Standard Funding: "));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+
+
+
+## [NC-7] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
 proving particularly beneficial for address-based filtering. However, gas costs increase with each 
 indexed field during emission, posing a challenge in maximizing the use of the allowable three fields per event. 
@@ -781,7 +832,7 @@ Events with three or more fields should ideally utilize all three indexed fields
 significant concern. In events with fewer than three fields, it's advisable to index all applicable fields, balancing 
 quick accessibility and efficient gas consumption
 
-*This issue was found 65 times:*
+*This issue was found 15 times:*
 
 ```solidity
 File: ./ajna-core/src/interfaces/pool/IPoolFactory.sol
@@ -795,102 +846,6 @@ File: ./ajna-core/src/interfaces/pool/IPoolFactory.sol
 
 ```solidity
 File: ./ajna-core/src/interfaces/pool/commons/IPoolEvents.sol
-
-22:        event AddQuoteToken(
-23:            address indexed lender,
-24:            uint256 indexed index,
-25:            uint256 amount,
-26:            uint256 lpAwarded,
-27:            uint256 lup
-28:        );
-
-
-58:        event RemoveQuoteToken(
-59:            address indexed lender,
-60:            uint256 indexed index,
-61:            uint256 amount,
-62:            uint256 lpRedeemed,
-63:            uint256 lup
-64:        );
-
-
-73:        event RemoveCollateral(
-74:            address indexed claimer,
-75:            uint256 indexed index,
-76:            uint256 amount,
-77:            uint256 lpRedeemed
-78:        );
-
-
-91:        event RepayDebt(
-92:            address indexed borrower,
-93:            uint256 quoteRepaid,
-94:            uint256 collateralPulled,
-95:            uint256 lup
-96:        );
-
-
-109:        event Kick(
-110:            address indexed borrower,
-111:            uint256 debt,
-112:            uint256 collateral,
-113:            uint256 bond
-114:        );
-
-
-122:        event BondWithdrawn(
-123:            address indexed kicker,
-124:            address indexed reciever,
-125:            uint256 amount
-126:        );
-
-
-138:        event BucketTake(
-139:            address indexed borrower,
-140:            uint256 index,
-141:            uint256 amount,
-142:            uint256 collateral,
-143:            uint256 bondChange,
-144:            bool    isReward
-145:        );
-
-
-154:        event BucketTakeLPAwarded(
-155:            address indexed taker,
-156:            address indexed kicker,
-157:            uint256 lpAwardedTaker,
-158:            uint256 lpAwardedKicker
-159:        );
-
-
-170:        event Take(
-171:            address indexed borrower,
-172:            uint256 amount,
-173:            uint256 collateral,
-174:            uint256 bondChange,
-175:            bool    isReward
-176:        );
-
-
-184:        event Settle(
-185:            address indexed borrower,
-186:            uint256 settledDebt
-187:        );
-
-
-194:        event AuctionSettle(
-195:            address indexed borrower,
-196:            uint256 collateral
-197:        );
-
-
-206:        event AuctionNFTSettle(
-207:            address indexed borrower,
-208:            uint256 collateral,
-209:            uint256 lp,
-210:            uint256 index
-211:        );
-
 
 219:        event KickReserveAuction(
 220:            uint256 claimableReservesRemaining,
@@ -906,60 +861,12 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolEvents.sol
 235:        );
 
 
-248:        event IncreaseLPAllowance(
-249:            address indexed owner,
-250:            address indexed spender,
-251:            uint256[] indexes,
-252:            uint256[] amounts
-253:        );
-
-
-262:        event DecreaseLPAllowance(
-263:            address indexed owner,
-264:            address indexed spender,
-265:            uint256[] indexes,
-266:            uint256[] amounts
-267:        );
-
-
-275:        event RevokeLPAllowance(
-276:            address indexed owner,
-277:            address indexed spender,
-278:            uint256[] indexes
-279:        );
-
-
-286:        event ApproveLPTransferors(
-287:            address indexed lender,
-288:            address[] transferors
-289:        );
-
-
-296:        event RevokeLPTransferors(
-297:            address indexed lender,
-298:            address[] transferors
-299:        );
-
-
 309:        event TransferLP(
 310:            address owner,
 311:            address newOwner,
 312:            uint256[] indexes,
 313:            uint256 lp
 314:        );
-
-
-325:        event BucketBankruptcy(
-326:            uint256 indexed index,
-327:            uint256 lpForfeited
-328:        );
-
-
-336:        event Flashloan(
-337:            address indexed receiver,
-338:            address indexed token,
-339:            uint256 amount
-340:        );
 
 
 355:        event ResetInterestRate(
@@ -979,97 +886,6 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolEvents.sol
 
 
 ```solidity
-File: ./ajna-core/src/interfaces/pool/erc20/IERC20PoolEvents.sol
-
-17:        event AddCollateral(
-18:            address indexed actor,
-19:            uint256 indexed index,
-20:            uint256 amount,
-21:            uint256 lpAwarded
-22:        );
-
-
-31:        event DrawDebt(
-32:            address indexed borrower,
-33:            uint256 amountBorrowed,
-34:            uint256 collateralPledged,
-35:            uint256 lup
-36:        );
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolEvents.sol)
-
-
-```solidity
-File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol
-
-17:        event AddCollateralNFT(
-18:            address indexed actor,
-19:            uint256 indexed index,
-20:            uint256[] tokenIds,
-21:            uint256   lpAwarded
-22:        );
-
-
-30:        event MergeOrRemoveCollateralNFT(
-31:            address indexed actor,
-32:            uint256 collateralMerged,
-33:            uint256 toIndexLps
-34:        );
-
-
-43:        event DrawDebtNFT(
-44:            address indexed borrower,
-45:            uint256   amountBorrowed,
-46:            uint256[] tokenIdsPledged,
-47:            uint256   lup
-48:        );
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol)
-
-
-```solidity
-File: ./ajna-core/src/interfaces/position/IPositionManagerEvents.sol
-
-25:        event MemorializePosition(
-26:            address indexed lender,
-27:            uint256 tokenId,
-28:            uint256[] indexes
-29:        );
-
-
-37:        event Mint(
-38:            address indexed lender,
-39:            address indexed pool,
-40:            uint256 tokenId
-41:        );
-
-
-52:        event MoveLiquidity(
-53:            address indexed lender,
-54:            uint256 tokenId,
-55:            uint256 fromIndex,
-56:            uint256 toIndex,
-57:            uint256 lpRedeemedFrom,
-58:            uint256 lpAwardedTo
-59:        );
-
-
-66:        event RedeemPosition(
-67:            address indexed lender,
-68:            uint256 tokenId,
-69:            uint256[] indexes
-70:        );
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerEvents.sol)
-
-
-```solidity
 File: ./ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol
 
 32:        event MoveStakedLiquidity(
@@ -1077,14 +893,6 @@ File: ./ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol
 34:            uint256[] fromIndexes,
 35:            uint256[] toIndexes
 36:        );
-
-
-57:        event UpdateExchangeRates(
-58:            address indexed caller,
-59:            address indexed ajnaPool,
-60:            uint256[] indexesUpdated,
-61:            uint256 rewardsClaimed
-62:        );
 
 ```
 
@@ -1094,16 +902,7 @@ File: ./ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol
 ```solidity
 File: ./ajna-core/src/libraries/external/KickerActions.sol
 
-85:        event Kick(address indexed borrower, uint256 debt, uint256 collateral, uint256 bond);
-
-
-86:        event RemoveQuoteToken(address indexed lender, uint256 indexed price, uint256 amount, uint256 lpRedeemed, uint256 lup);
-
-
 87:        event KickReserveAuction(uint256 claimableReservesRemaining, uint256 auctionPrice, uint256 currentBurnEpoch);
-
-
-88:        event BucketBankruptcy(uint256 indexed index, uint256 lpForfeited);
 
 ```
 
@@ -1113,42 +912,11 @@ File: ./ajna-core/src/libraries/external/KickerActions.sol
 ```solidity
 File: ./ajna-core/src/libraries/external/LPActions.sol
 
-23:        event ApproveLPTransferors(address indexed lender, address[] transferors);
-
-
-24:        event RevokeLPTransferors(address indexed lender, address[] transferors);
-
-
-25:        event IncreaseLPAllowance(address indexed owner, address indexed spender, uint256[] indexes, uint256[] amounts);
-
-
-26:        event DecreaseLPAllowance(address indexed owner, address indexed spender, uint256[] indexes, uint256[] amounts);
-
-
-27:        event RevokeLPAllowance(address indexed owner, address indexed spender, uint256[] indexes);
-
-
 28:        event TransferLP(address owner, address newOwner, uint256[] indexes, uint256 lp);
 
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol)
-
-
-```solidity
-File: ./ajna-core/src/libraries/external/LenderActions.sol
-
-70:        event AddQuoteToken(address indexed lender, uint256 indexed index, uint256 amount, uint256 lpAwarded, uint256 lup);
-
-
-71:        event BucketBankruptcy(uint256 indexed index, uint256 lpForfeited);
-
-
-73:        event RemoveQuoteToken(address indexed lender, uint256 indexed index, uint256 amount, uint256 lpRedeemed, uint256 lup);
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol)
 
 
 ```solidity
@@ -1165,35 +933,7 @@ File: ./ajna-core/src/libraries/external/PoolCommons.sol
 
 
 ```solidity
-File: ./ajna-core/src/libraries/external/SettlerActions.sol
-
-67:        event AuctionSettle(address indexed borrower, uint256 collateral);
-
-
-68:        event AuctionNFTSettle(address indexed borrower, uint256 collateral, uint256 lp, uint256 index);
-
-
-69:        event BucketBankruptcy(uint256 indexed index, uint256 lpForfeited);
-
-
-70:        event Settle(address indexed borrower, uint256 settledDebt);
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol)
-
-
-```solidity
 File: ./ajna-core/src/libraries/external/TakerActions.sol
-
-100:        event BucketTake(address indexed borrower, uint256 index, uint256 amount, uint256 collateral, uint256 bondChange, bool isReward);
-
-
-101:        event BucketTakeLPAwarded(address indexed taker, address indexed kicker, uint256 lpAwardedTaker, uint256 lpAwardedKicker);
-
-
-102:        event Take(address indexed borrower, uint256 amount, uint256 collateral, uint256 bondChange, bool isReward);
-
 
 103:        event ReserveAuction(uint256 claimableReservesRemaining, uint256 auctionPrice, uint256 currentBurnEpoch);
 
@@ -1220,9 +960,6 @@ File: ./ajna-grants/src/grants/interfaces/IFunding.sol
 63:            string description
 64:        );
 
-
-69:        event VoteCast(address indexed voter, uint256 proposalId, uint8 support, uint256 weight, string reason);
-
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IFunding.sol)
@@ -1236,27 +973,6 @@ File: ./ajna-grants/src/grants/interfaces/IGrantFund.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IGrantFund.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IGrantFund.sol)
-
-
-```solidity
-File: ./ajna-grants/src/grants/interfaces/IStandardFunding.sol
-
-85:        event QuarterlyDistributionStarted(
-86:            uint256 indexed distributionId,
-87:            uint256 startBlock,
-88:            uint256 endBlock
-89:        );
-
-
-97:        event DelegateRewardClaimed(
-98:            address indexed delegateeAddress,
-99:            uint256 indexed distributionId,
-100:            uint256 rewardClaimed
-101:        );
-
-```
-
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol)
 
 
 

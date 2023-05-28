@@ -120,7 +120,7 @@ impl Detector for NumericTimeVariables {
     }
 
     fn get_detector_name(&self) -> String {
-        return "MissingIndexedFields".to_string();
+        return "NumericTimeVariables".to_string();
     }
 
     fn get_metadata(&self) -> IssueMetadata {
