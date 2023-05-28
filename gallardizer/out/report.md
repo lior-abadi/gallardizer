@@ -28,10 +28,11 @@ Total: 23 instances over 5 issues
 | [NC-3] | Add descriptive revert reasons | 1 |
 | [NC-4] | Avoid using magic numbers | 61 |
 | [NC-5] | Time-related numeric values could employ time units | 3 |
-| [NC-6] | Inadequate indexing of event fields | 65 |
+| [NC-6] | Expressions defining constant values should employ `immutable` instead of `constant` | 4 |
+| [NC-7] | Inadequate indexing of event fields | 65 |
 
 
-Total: 140 instances over 6 issues
+Total: 144 instances over 7 issues
 
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
@@ -42,7 +43,7 @@ Total: 140 instances over 6 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 174 instances over 14 issues, potentially saving over 350 gas units**
+**Total: 178 instances over 15 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -752,7 +753,8 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 ## [NC-5] Time-related numeric values could employ time units
 For readability and consistency, numeric values associated with time should
-utilize predefined units like seconds, minutes, hours, days, or weeks..
+utilize predefined [units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#time-units) 
+like seconds, minutes, hours, days, or weeks.
 
 *This issue was found 3 times:*
 
@@ -773,7 +775,56 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 
 
-## [NC-6] Inadequate indexing of event fields
+## [NC-6] Expressions defining constant values should employ `immutable` instead of `constant`
+It's important to distinguish between `constant` and `immutable` variables, 
+using each in their appropriate situations. Constants are suitable for literal values 
+hard-coded into the contracts, while `immutables` should be used for expression-based values, such as a call to `keccak256()`, 
+or those calculated/introduced in the `constructor`.
+
+*This issue was found 4 times:*
+
+```solidity
+File: ./ajna-core/src/ERC20PoolFactory.sol
+
+28:        bytes32 public constant ERC20_NON_SUBSET_HASH = keccak256("ERC20_NON_SUBSET_HASH");
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol)
+
+
+```solidity
+File: ./ajna-core/src/ERC721PoolFactory.sol
+
+30:        bytes32 public constant ERC721_NON_SUBSET_HASH = keccak256("ERC721_NON_SUBSET_HASH");
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/ExtraordinaryFunding.sol
+
+28:        bytes32 internal constant DESCRIPTION_PREFIX_HASH_EXTRAORDINARY = keccak256(bytes("Extraordinary Funding: "));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/StandardFunding.sol
+
+51:        bytes32 internal constant DESCRIPTION_PREFIX_HASH_STANDARD = keccak256(bytes("Standard Funding: "));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+
+
+
+## [NC-7] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
 proving particularly beneficial for address-based filtering. However, gas costs increase with each 
 indexed field during emission, posing a challenge in maximizing the use of the allowable three fields per event. 
