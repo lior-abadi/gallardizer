@@ -98,7 +98,7 @@ impl Detector for MagicNumbers {
     }
 
     fn get_detector_name(&self) -> String {
-        return "MissingIndexedFields".to_string();
+        return "MagicNumbers".to_string();
     }
 
     fn get_metadata(&self) -> IssueMetadata {

@@ -13,11 +13,7 @@ contract HelloWorld {
     // modifier onlyOwner() {
     //     _;
     // }
-    uint256 internal CHALLENGE_PERIOD_LENGTH = 50400;
-    uint256 internal CHALLENGE_PERIOD = 50400 days;
-    uint256 internal period = 50400 mem;
-
-    uint256 internal mengolith = 50400;
+    bytes32 internal constant DESCRIPTION_PREFIX_HASH_EXTRAORDINARY = keccak256(bytes("Extraordinary Funding: "));
 
     // function test(uint256 a, uint256 b, bytes4 selector) external returns (uint256) {
     //     // uint256 someCalc = a + 68;

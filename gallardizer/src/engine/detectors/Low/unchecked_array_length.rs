@@ -107,7 +107,7 @@ impl Detector for UncheckedArrayLength {
     }
 
     fn get_detector_name(&self) -> String {
-        return "MissingIndexedFields".to_string();
+        return "UncheckedArrayLength".to_string();
     }
 
     fn get_metadata(&self) -> IssueMetadata {
