@@ -127,7 +127,7 @@ pub mod Med;
 pub mod NonCritical;
 
 use self::{
-    Gas::use_custom_errors,
+    Gas::{storage_for_mapping_array, use_custom_errors},
     Low::{
         division_by_zero, ext_call_for_loop, loss_of_precision, pragma_version,
         require_instead_of_assert, unchecked_array_length,
@@ -197,11 +197,14 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(loc_too_long::LocTooLong {
             detected_issues: Vec::new(),
         }),
+        Box::new(missing_indexed_fields::MissingIndexedFields {
+            detected_issues: Vec::new(),
+        }),
         /* ==== GAS ==== */
         Box::new(use_custom_errors::CustomErrorsInsteadOfRevertStrings {
             detected_issues: Vec::new(),
         }),
-        Box::new(missing_indexed_fields::MissingIndexedFields {
+        Box::new(storage_for_mapping_array::StorageForMappingArray {
             detected_issues: Vec::new(),
         }),
         /* Add more detector modules */
