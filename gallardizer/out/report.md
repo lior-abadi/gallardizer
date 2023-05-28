@@ -39,12 +39,13 @@ Total: 185 instances over 8 issues
 | |Issue|Instances|Total Gas Saved|
 |-|:-|:-:|:-:|
 | [G-1] | Adopt custom errors over `revert()/require()` strings | 7 | 350 |
+| [G-2] | Prefer `storage` over `memory` for structs/arrays | 5 | 21000 |
 
 
-Total: 7 instances over 1 issue, saving over 350 gas units
+Total: 12 instances over 2 issues, saving over 50750 gas units
 
 ## Overall Results
-**Total: 219 instances over 16 issues, potentially saving over 350 gas units**
+**Total: 224 instances over 17 issues, potentially saving over 50750 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -1512,6 +1513,42 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+
+
+
+## [G-2] Prefer `storage` over `memory` for structs/arrays
+Retrieving data from `storage` and assigning it to a `memory` variable leads to every element of the 
+`struct` or array being loaded from storage, which comes with a gas cost (`Gcoldsload`) of `2100` per element. 
+If the elements are accessed from this memory variable, it incurs an additional `MLOAD` cost, bypassing a 
+more affordable stack read. A more efficient approach is to declare the variable with the `storage` keyword 
+and cache any elements that will be accessed multiple times in stack variables, as this only incurs the 
+`Gcoldsload` cost for the elements that are actually accessed. The strategy of loading the entire struct or 
+array into a memory variable is only beneficial if the function is returning the entire struct or array, 
+if it's being passed to a function that needs a memory parameter, or if it's being accessed from another 
+memory struct or array.
+
+*This issue was found 5 times:*
+
+```solidity
+File: ./ajna-grants/src/grants/base/StandardFunding.sol
+
+203:            uint256[] memory fundingProposalIds = _fundedProposalSlates[fundedSlateHash];
+
+
+209:                Proposal memory proposal = _standardFundingProposals[fundingProposalIds[i]];
+
+
+242:            QuarterlyDistribution memory currentDistribution = _distributions[distributionId_];
+
+
+379:            QuarterlyDistribution memory currentDistribution = _distributions[_currentDistributionId];
+
+
+575:            QuarterlyDistribution memory currentDistribution = _distributions[_currentDistributionId];
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
 
 
 
