@@ -27,10 +27,11 @@ Total: 23 instances over 5 issues
 | [NC-2] | Prefer scientific notation over exponentiation | 9 |
 | [NC-3] | Add descriptive revert reasons | 1 |
 | [NC-4] | Avoid using magic numbers | 61 |
-| [NC-5] | Inadequate indexing of event fields | 65 |
+| [NC-5] | Time-related numeric values could employ time units | 3 |
+| [NC-6] | Inadequate indexing of event fields | 65 |
 
 
-Total: 137 instances over 5 issues
+Total: 140 instances over 6 issues
 
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
@@ -41,7 +42,7 @@ Total: 137 instances over 5 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 171 instances over 13 issues, potentially saving over 350 gas units**
+**Total: 174 instances over 14 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -749,7 +750,30 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 
 
-## [NC-5] Inadequate indexing of event fields
+## [NC-5] Time-related numeric values could employ time units
+For readability and consistency, numeric values associated with time should
+utilize predefined units like seconds, minutes, hours, days, or weeks..
+
+*This issue was found 3 times:*
+
+```solidity
+File: ./ajna-grants/src/grants/base/StandardFunding.sol
+
+34:        uint256 internal constant CHALLENGE_PERIOD_LENGTH = 50400;
+
+
+40:        uint48 internal constant DISTRIBUTION_PERIOD_LENGTH = 648000;
+
+
+46:        uint256 internal constant FUNDING_PERIOD_LENGTH = 72000;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+
+
+
+## [NC-6] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
 proving particularly beneficial for address-based filtering. However, gas costs increase with each 
 indexed field during emission, posing a challenge in maximizing the use of the allowable three fields per event. 

@@ -2,8 +2,6 @@
 pragma solidity 0.8.17;
 
 contract HelloWorld {
-    event Testing(uint256 rojo, address azul, bytes32 amarillo, uint8 indexed verde);
-
     // modifier nonReentrant() {
     //     _;
     // }
@@ -15,19 +13,24 @@ contract HelloWorld {
     // modifier onlyOwner() {
     //     _;
     // }
+    uint256 internal CHALLENGE_PERIOD_LENGTH = 50400;
+    uint256 internal CHALLENGE_PERIOD = 50400 days;
+    uint256 internal period = 50400 mem;
 
-    function test(uint256 a, uint256 b, bytes4 selector) external returns (uint256) {
-        // uint256 someCalc = a + 68;
-        // uint256 z = a % 2 != 0 ? b : 10 ** 18;
-        uint256 k = 100 / 24;
-        bool k1 = k > 0;
-        bool k1 = k > 1e18;
+    uint256 internal mengolith = 50400;
 
-        if (selector != bytes4(0xa9059cbb)) revert InvalidProposal();
-        // if (selector != bytes4(0x0)) revert InvalidProposal();
+    // function test(uint256 a, uint256 b, bytes4 selector) external returns (uint256) {
+    //     // uint256 someCalc = a + 68;
+    //     // uint256 z = a % 2 != 0 ? b : 10 ** 18;
+    //     uint256 k = 100 / 24;
+    //     bool k1 = k > 0;
+    //     bool k1 = k > 1e18;
 
-        return a / b;
-    }
+    //     if (selector != bytes4(0xa9059cbb)) revert InvalidProposal();
+    //     // if (selector != bytes4(0x0)) revert InvalidProposal();
+
+    //     return a / b;
+    // }
 
     // function test2(uint256 c, uint256 d) external returns (uint256) {
     //     _check(d);

@@ -4,7 +4,7 @@ use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
-use solang_parser::pt::{ContractPart, EventDefinition, Expression, SourceUnitPart};
+use solang_parser::pt::{ContractPart, Expression, SourceUnitPart};
 
 pub struct MagicNumbers {
     pub detected_issues: Vec<IssueAppearance>,
