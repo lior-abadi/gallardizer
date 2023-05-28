@@ -9,11 +9,11 @@ use solang_parser::pt::{
     Statement, StorageLocation, VariableAttribute,
 };
 
-pub struct StorageForMappingArray {
+pub struct DivisionByTwoShift {
     pub detected_issues: Vec<IssueAppearance>,
 }
 
-impl Detector for StorageForMappingArray {
+impl Detector for DivisionByTwoShift {
     fn run_detector(&mut self, parsed_file: &FileNameWithContent) {
         let functions = extract_target_from_node(
             Target::FunctionDefinition,
@@ -95,37 +95,7 @@ impl Detector for StorageForMappingArray {
             }
 
             // Handle elements declared outside contracts
-            if let Some(source_part) = some_source_part {
-                // Filter view functions
-                let mut is_view_or_pure: bool = false;
-                match &source_part {
-                    SourceUnitPart::FunctionDefinition(def) => {
-                        for attribute in &def.attributes {
-                            match attribute {
-                                FunctionAttribute::Mutability(_) => {
-                                    is_view_or_pure = true;
-                                }
-                                _ => (),
-                            }
-                        }
-                    }
-                    _ => (),
-                }
-
-                // Skip view or pure functions
-                if is_view_or_pure {
-                    continue;
-                }
-                let variable_defs = extract_target_from_node(
-                    Target::VariableDefinition,
-                    source_part.clone().into(),
-                );
-                let locs = detect_issue(variable_defs, &global_vars);
-                for loc in locs {
-                    self.detected_issues
-                        .push(get_appearance_metadata(&loc, parsed_file));
-                }
-            }
+            if let Some(source_part) = some_source_part {}
         }
     }
 
@@ -134,25 +104,21 @@ impl Detector for StorageForMappingArray {
     }
 
     fn get_detector_name(&self) -> String {
-        return "StorageForMappingArray".to_string();
+        return "DivisionByTwoShift".to_string();
     }
 
     fn get_metadata(&self) -> IssueMetadata {
         let metadata: IssueMetadata = IssueMetadata {
             severity: Severities::Gas,
-            title: indoc! {"Prefer `storage` over `memory` for structs/arrays"}.to_string(),
+            title: indoc! {"Use bit shifting for division by two"}.to_string(),
             content: indoc! {
-            "Retrieving data from `storage` and assigning it to a `memory` variable leads to every element of the 
-            `struct` or array being loaded from storage, which comes with a gas cost (`Gcoldsload`) of `2100` per element. 
-            If the elements are accessed from this memory variable, it incurs an additional `MLOAD` cost, bypassing a 
-            more affordable stack read. A more efficient approach is to declare the variable with the `storage` keyword 
-            and cache any elements that will be accessed multiple times in stack variables, as this only incurs the 
-            `Gcoldsload` cost for the elements that are actually accessed. The strategy of loading the entire struct or 
-            array into a memory variable is only beneficial if the function is returning the entire struct or array, 
-            if it's being passed to a function that needs a memory parameter, or if it's being accessed from another 
-            memory struct or array."}
+            "The expression `<x> / 2` has the same result as `<x> >> 1`.
+            Despite the compiler's use of the `SHR` opcode for both processes, 
+            the division form involves an additional gas expense of `20` due to 
+            redirects to a compiler utility function that adds checks. These 
+            checks can be bypassed by incorporating `unchecked {}` when dividing by two."}
             .to_string(),
-            gas_saved_per_instance: 4200,
+            gas_saved_per_instance: 20,
         };
 
         return metadata;
