@@ -1,12 +1,11 @@
 use crate::engine::detectors::{get_appearance_metadata, Detector};
-use crate::engine::parser::{extract_target_from_node, extract_targets_from_node, Node, Target};
+use crate::engine::parser::{extract_target_from_node, Node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
 use solang_parser::pt::{
-    ContractPart, Expression, FunctionAttribute, Identifier, Loc, Mutability, SourceUnitPart,
-    Statement, StorageLocation, VariableAttribute,
+    ContractPart, Expression, FunctionAttribute, Loc, SourceUnitPart, Statement, StorageLocation,
 };
 
 pub struct StorageForMappingArray {
