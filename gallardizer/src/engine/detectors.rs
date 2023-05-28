@@ -91,7 +91,23 @@ fn get_match_with_regex(parsed_file: &FileNameWithContent, pattern: Regex) -> Ve
     return detected_issues;
 }
 
+pub fn get_appearance_metadata_with_comments(
+    loc: &Loc,
+    parsed_file: &FileNameWithContent,
+    additional_comments: &str,
+) -> IssueAppearance {
+    return appearance_metadata(loc, parsed_file, additional_comments);
+}
+
 pub fn get_appearance_metadata(loc: &Loc, parsed_file: &FileNameWithContent) -> IssueAppearance {
+    return appearance_metadata(loc, parsed_file, "");
+}
+
+fn appearance_metadata(
+    loc: &Loc,
+    parsed_file: &FileNameWithContent,
+    additional_comments: &str,
+) -> IssueAppearance {
     let mut issue_appearance = IssueAppearance {
         file_path: String::new(),
         metadata: vec![],
@@ -108,6 +124,7 @@ pub fn get_appearance_metadata(loc: &Loc, parsed_file: &FileNameWithContent) -> 
             metadata.push(AppearanceMetadata {
                 line: (line),
                 content: (line_content.to_owned()),
+                additional_comments: additional_comments.to_owned(),
             })
         }
 
@@ -136,6 +153,7 @@ use self::{
     NonCritical::{
         keccak_immutable, loc_too_long, magic_numbers, missing_indexed_fields,
         numeric_timevariables, reentrancy_modifier_precedence, revert_strings, scientific_notation,
+        typos,
     },
 };
 
@@ -195,6 +213,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(loc_too_long::LocTooLong {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(typos::Typos {
             detected_issues: Vec::new(),
         }),
         /* ==== GAS ==== */

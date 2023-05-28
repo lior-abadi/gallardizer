@@ -7,9 +7,11 @@ pub fn parse_targets(targets: Vec<FileNameWithContent>) -> Vec<FileNameWithConte
     let mut parsed_files: Vec<FileNameWithContent> = Vec::new();
     for mut target in targets {
         let literal_target: String = format!(r#"{}"#, target.file_content);
-        let (tree, _comments) = parse(literal_target.as_str(), 0).unwrap();
+        let (tree, comments) = parse(literal_target.as_str(), 0).unwrap();
 
         target.parsed_ast_tree = tree;
+        target.comments = comments;
+
         parsed_files.push(target);
     }
 

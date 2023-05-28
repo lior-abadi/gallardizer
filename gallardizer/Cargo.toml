@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.3.0", features = ["cargo"] }
 indoc = "2.0.1"
+ispell = "0.3.1"
 regex = "1.8.1"
 solang-parser = "0.2.4"
 walkdir = "2.3.3"
-

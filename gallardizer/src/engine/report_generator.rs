@@ -30,6 +30,7 @@ impl Severities {
 pub struct AppearanceMetadata {
     pub line: usize,
     pub content: String,
+    pub additional_comments: String,
 }
 
 #[derive(Debug, Clone)]
@@ -337,6 +338,15 @@ fn format_appearance(
     }
 
     for line_of_code in &issue_appearance.metadata {
+        // If additional comments were passed, render them
+        if &line_of_code.additional_comments != "" {
+            let comment_addition = &format!(
+                "\n/// [Audit Comment] {}",
+                &line_of_code.additional_comments
+            );
+            formatted_appearance += comment_addition;
+        }
+
         let line_number_with_content = &format!(
             "\n{}:    {}",
             &line_of_code.line.to_string(),

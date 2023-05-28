@@ -29,13 +29,6 @@ impl Detector for LocTooLong {
                 let start_offset = lines[..index].iter().map(|l| l.len() + 1).sum::<usize>();
                 let end_offset = start_offset + line_length;
 
-                println!(
-                    "Line {} is over 120 characters. Start Offset: {}, End Offset: {}",
-                    index + 1,
-                    start_offset,
-                    end_offset
-                );
-
                 let loc = Loc::File(0, start_offset, end_offset);
                 self.detected_issues
                     .push(get_appearance_metadata(&loc, parsed_file));

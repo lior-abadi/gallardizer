@@ -1,3 +1,4 @@
+use solang_parser::pt::Comment;
 use solang_parser::pt::SourceUnit;
 use std::env;
 use std::fs;
@@ -11,6 +12,7 @@ pub struct FileNameWithContent {
     pub filename: String,
     pub file_content: String,
     pub parsed_ast_tree: SourceUnit,
+    pub comments: Vec<Comment>,
 }
 
 pub fn get_all_solidity_files(directory: &str) -> Vec<FileNameWithContent> {
@@ -73,11 +75,13 @@ fn read_files_with_extension(
             .to_string();
         file_relative_path.insert_str(0, "./");
 
+        // the parsed tree and the comments will be added when running the parser over the file
         file_contents.push(FileNameWithContent {
             filename,
             file_path: file_relative_path,
             file_content: contents,
             parsed_ast_tree: SourceUnit(vec![]),
+            comments: vec![],
         });
     }
 
