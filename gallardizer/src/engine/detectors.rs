@@ -134,8 +134,8 @@ use self::{
     },
     Med::{centralization_risk, safe_mint_erc721, safe_transfer_erc721, solmate_safetransfer},
     NonCritical::{
-        keccak_immutable, magic_numbers, missing_indexed_fields, numeric_timevariables,
-        reentrancy_modifier_precedence, revert_strings, scientific_notation,
+        keccak_immutable, loc_too_long, magic_numbers, missing_indexed_fields,
+        numeric_timevariables, reentrancy_modifier_precedence, revert_strings, scientific_notation,
     },
 };
 
@@ -192,6 +192,9 @@ fn get_all_detectors() -> Vec<Box<dyn Detector>> {
             detected_issues: Vec::new(),
         }),
         Box::new(keccak_immutable::KeccakImmutable {
+            detected_issues: Vec::new(),
+        }),
+        Box::new(loc_too_long::LocTooLong {
             detected_issues: Vec::new(),
         }),
         /* ==== GAS ==== */

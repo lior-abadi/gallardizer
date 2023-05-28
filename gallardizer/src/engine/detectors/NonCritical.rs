@@ -1,4 +1,5 @@
 pub mod keccak_immutable;
+pub mod loc_too_long;
 pub mod magic_numbers;
 pub mod missing_indexed_fields;
 pub mod numeric_timevariables;
