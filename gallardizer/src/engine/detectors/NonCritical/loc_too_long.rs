@@ -1,5 +1,4 @@
 use crate::engine::detectors::{get_appearance_metadata, Detector};
-use crate::engine::parser::{extract_target_from_node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
