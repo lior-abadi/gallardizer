@@ -1,12 +1,11 @@
 use crate::engine::detectors::{get_appearance_metadata, Detector};
-use crate::engine::parser::{extract_target_from_node, extract_targets_from_node, Node, Target};
+use crate::engine::parser::{extract_target_from_node, Node, Target};
 use crate::engine::report_generator::{IssueAppearance, IssueMetadata, Severities};
 use crate::utils::file_processor::FileNameWithContent;
 use indoc::indoc;
 
 use solang_parser::pt::{
-    ContractPart, Expression, FunctionAttribute, Identifier, Loc, Mutability, SourceUnitPart,
-    Statement, StorageLocation, VariableAttribute,
+    ContractPart, Expression, FunctionAttribute, Loc, SourceUnitPart, Statement, StorageLocation,
 };
 
 pub struct StorageForMappingArray {
@@ -96,6 +95,26 @@ impl Detector for StorageForMappingArray {
 
             // Handle elements declared outside contracts
             if let Some(source_part) = some_source_part {
+                // Filter view functions
+                let mut is_view_or_pure: bool = false;
+                match &source_part {
+                    SourceUnitPart::FunctionDefinition(def) => {
+                        for attribute in &def.attributes {
+                            match attribute {
+                                FunctionAttribute::Mutability(_) => {
+                                    is_view_or_pure = true;
+                                }
+                                _ => (),
+                            }
+                        }
+                    }
+                    _ => (),
+                }
+
+                // Skip view or pure functions
+                if is_view_or_pure {
+                    continue;
+                }
                 let variable_defs = extract_target_from_node(
                     Target::VariableDefinition,
                     source_part.clone().into(),

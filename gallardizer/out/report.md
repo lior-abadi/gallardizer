@@ -40,12 +40,13 @@ Total: 185 instances over 8 issues
 |-|:-|:-:|:-:|
 | [G-1] | Adopt custom errors over `revert()/require()` strings | 7 | 350 |
 | [G-2] | Prefer `storage` over `memory` for structs/arrays | 5 | 21000 |
+| [G-3] | Use bit shifting for division by two | 12 | 240 |
 
 
-Total: 12 instances over 2 issues, saving over 50750 gas units
+Total: 24 instances over 3 issues, saving over 51230 gas units
 
 ## Overall Results
-**Total: 224 instances over 17 issues, potentially saving over 50750 gas units**
+**Total: 236 instances over 18 issues, potentially saving over 51230 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -1549,6 +1550,80 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 ```
 
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+
+
+
+## [G-3] Use bit shifting for division by two
+The expression `<x> / 2` has the same result as `<x> >> 1`.
+Despite the compiler's use of the `SHR` opcode for both processes, 
+the division form involves an additional gas expense of `20` due to 
+redirects to a compiler utility function that adds checks. These 
+checks can be bypassed by incorporating `unchecked {}` when dividing by two.
+
+*This issue was found 12 times:*
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
+
+80:            for (uint256 i = 0; i < len / 2; i++) {
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Loans.sol
+
+136:            if (index_ == ROOT_INDEX || loan_.thresholdPrice <= loans_.loans[index_ / 2].thresholdPrice){
+
+
+139:              _insert(loans_, loans_.loans[index_ / 2], index_, count);
+
+
+140:              _bubbleUp(loans_, loan_, index_ / 2);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Maths.sol
+
+14:            return (x * y + WAD / 2) / WAD;
+
+
+22:            return (x * WAD + y / 2) / y;
+
+
+42:            return (x * y + 10**27 / 2) / 10**27;
+
+
+58:            return (x + 10**9 / 2) / 10**9;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/libraries/Maths.sol
+
+21:                uint256 x = y / 2 + 1;
+
+
+24:                    x = (y / x + x) / 2;
+
+
+34:            return (x * y + 10**18 / 2) / 10**18;
+
+
+38:            return (x * 10**18 + y / 2) / y;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
 
 
 
