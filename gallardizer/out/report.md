@@ -29,10 +29,11 @@ Total: 23 instances over 5 issues
 | [NC-4] | Avoid using magic numbers | 61 |
 | [NC-5] | Time-related numeric values could employ time units | 3 |
 | [NC-6] | Expressions defining constant values should employ `immutable` instead of `constant` | 4 |
-| [NC-7] | Inadequate indexing of event fields | 15 |
+| [NC-7] | Long lines of code | 91 |
+| [NC-8] | Inadequate indexing of event fields | 15 |
 
 
-Total: 94 instances over 7 issues
+Total: 185 instances over 8 issues
 
 ## Gas Optimizations
 | |Issue|Instances|Total Gas Saved|
@@ -43,7 +44,7 @@ Total: 94 instances over 7 issues
 Total: 7 instances over 1 issue, saving over 350 gas units
 
 ## Overall Results
-**Total: 128 instances over 15 issues, potentially saving over 350 gas units**
+**Total: 219 instances over 16 issues, potentially saving over 350 gas units**
 
 # Medium Risk Issues
 ## [M-1] Prioritize <code>_safeMint()</code> over <code>_mint()</code> for enhanced security when minting NFTs
@@ -824,7 +825,485 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 
 
-## [NC-7] Inadequate indexing of event fields
+## [NC-7] Long lines of code
+Traditionally, source code lines are restricted to 80 characters. 
+With contemporary screens being considerably larger, this rule can be somewhat relaxed. 
+The [Solidity style guide](https://docs.soliditylang.org/en/latest/style-guide.html#maximum-line-length), however, suggests a maximum limit of 120 characters per line. 
+Therefore, it's advisable to break up lines when they approach this length.
+
+*This issue was found 91 times:*
+
+```solidity
+File: ./ajna-core/src/ERC20Pool.sol
+
+127:         *  @dev    - update `t0Debt2ToCollateral` ratio only if loan not in auction, debt and collateral pre action are considered 0 if auction settled
+
+
+201:         *  @dev    - update `t0Debt2ToCollateral` ratio only if loan not in auction, debt and collateral pre action are considered 0 if auction settled
+
+
+351:         *  @dev    - no update of `t0Debt2ToCollateral` ratio as debt and collateral pre settle are not taken into account (pre debt and pre collateral = 0)
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/ERC721Pool.sol
+
+134:         *  @dev    - update `t0Debt2ToCollateral` ratio only if loan not in auction, debt and collateral pre action are considered 0 if auction settled
+
+
+209:         *  @dev    - update `t0Debt2ToCollateral` ratio only if loan not in auction, debt and collateral pre action are considered 0 if auction settled
+
+
+394:         *  @dev    - no update of `t0Debt2ToCollateral` ratio as debt and collateral pre settle are not taken into account (pre debt and pre collateral = 0)
+
+
+472:            // transfer from taker to pool the amount of quote tokens needed to cover collateral auctioned (including excess for rounded collateral)
+
+
+552:         *  @param  poolTokens_ Array in pool that tracks `NFT` ids (could be tracking `NFT`s pledged by borrower or `NFT`s added by a lender in a specific bucket).
+
+
+576:         *  @param  poolTokens_     Array in pool that tracks `NFT` ids (could be tracking `NFT`s pledged by borrower or `NFT`s added by a lender in a specific bucket).
+
+
+604:         *  @notice Helper function to transfer an `NFT` from owner to target address (reused in code to reduce contract deployment bytecode size).
+
+
+605:         *  @dev    Since `transferFrom` is used instead of `safeTransferFrom`, calling smart contracts must be careful to check that they support any received `NFT`s.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/ERC721PoolFactory.sol
+
+17:     *  @notice Pool factory contract for creating `ERC721` pools. If a list with token ids is provided then a subset `ERC721` pool is created for the `NFT`.
+
+
+18:     *  @notice Pool factory contract for creating `ERC20` pools.  If a list with token ids is provided then a subset `ERC721` pool is created for the `NFT`. Actors actions:
+
+
+19:     *          - `Pool creators`: create pool by providing a fungible token for quote, a non fungible token for collateral and an interest rate between `1%-10%`.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+
+
+```solidity
+File: ./ajna-core/src/RewardsManager.sol
+
+379:         *  @dev    Rewards are calculated as the difference in exchange rates between the last interaction burn event and the current burn event.
+
+
+418:         *  @dev    Rewards are calculated as the difference in exchange rates between the last interaction burn event and the current burn event.
+
+
+666:         *  @dev    Caller can claim `5%` of the rewards that have accumulated to each bucket since the last burn event, if it hasn't already been updated.
+
+
+808:         *  @dev   It is used to ensure that rewards claimers will be able to claim some portion of the remaining tokens if a claim would exceed the remaining contract balance.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
+
+
+```solidity
+File: ./ajna-core/src/base/Pool.sol
+
+402:            // start a new claimable reserve auction, passing in relevant parameters such as the current pool size, debt, balance, and inflator value
+
+
+554:            poolState_.collateral -= (result_.collateralAmount + result_.compensatedCollateral); // deduct collateral taken plus collateral compensated if NFT auction settled
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol
+
+11:         *  @notice Called by fully colalteralized borrowers to restamp the `Neutral Price` of the loan (only if loan is fully collateralized and not in auction).
+
+
+12:         *          The reason for stamping the neutral price on the loan is to provide some certainty to the borrower as to at what price they can expect to be liquidated.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/commons/IPoolErrors.sol
+
+44:         *  @notice Borrower is attempting to create or modify a loan such that their loan's quote token would be less than the pool's minimum debt amount.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolErrors.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolErrors.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/commons/IPoolInternals.sol
+
+46:        uint256 excessQuoteToken;      // [WAD] (NFT only) amount of quote tokens to be paid by taker to borrower for fractional collateral, used in take action
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolInternals.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolInternals.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/commons/IPoolState.sol
+
+45:         *  @return t0Debt2ToCollateral_ t0debt accross all borrowers divided by their collateral, used in determining a collateralization weighted debt.
+
+
+107:         *  @dev    If a reserve auction is active, it refers to the current reserve auction. If no reserve auction is active, it refers to the last reserve auction.
+
+
+434:        uint256 unclaimed;                         // [WAD] Amount of claimable reserves which has not been taken in the Claimable Reserve Auction.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolState.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolState.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol
+
+13:         *  @param  depositTake_      If `true` then the take will happen at an auction price equal with bucket price. Auction price is used otherwise.
+
+
+25:         *  @param  maxAmount_        Max amount of collateral that will be taken from the auction (max number of `NFT`s in case of `ERC721` pool).
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol
+
+12:         *  @dev    Can be called by borrowers with either `0` `amountToBorrow_` or `0` `collateralToPledge_`, if borrower only wants to take a single action. 
+
+
+15:         *  @param  limitIndex_         Lower bound of `LUP` change (if any) that the borrower will tolerate from a creating or modifying position.
+
+
+27:         *  @dev    Can be called by borrowers with either `0` `maxQuoteTokenAmountToRepay_` or `0` `collateralAmountToPull_`, if borrower only wants to take a single action. 
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol
+
+12:         *  @dev    Can be called by borrowers with either `0` `amountToBorrow_` or `0` `collateralToPledge`_, if borrower only wants to take a single action. 
+
+
+15:         *  @param  limitIndex_       Lower bound of `LUP` change (if any) that the borrower will tolerate from a creating or modifying position.
+
+
+27:         *  @dev    Can be called by borrowers with either `0` `maxQuoteTokenAmountToRepay_` or `0` `collateralAmountToPull_`, if borrower only wants to take a single action. 
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol
+
+28:         *  @param  toIndexLps              If non-zero, amount of LP in toIndex when collateral is merged into bucket. If 0, no collateral is merged.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol
+
+26:         *  @param  noOfNFTsToRemove_ Intergral number of `NFT`s to remove if collateral amount is met `noOfNFTsToRemove_`, else merge at bucket index, `toIndex_`.
+
+
+29:         *  @return bucketLP_         If non-zero, amount of `LP` in `toIndex_` when collateral is merged into bucket. If `0`, no collateral is merged.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol
+
+22:         *  @dev    The NFT must have already been created, and the number of buckets to be memorialized at a time determined by function caller.
+
+
+24:         *  @dev    `Pool.increaseLPAllowance` must be called prior to calling this method in order to allow Position manager contract to transfer LP to be memorialized.
+
+
+33:         *  @dev    Position `NFT`s can only be minited with an association to pools that have been deployed by the `Ajna` `ERC20PoolFactory` or `ERC721PoolFactory`.
+
+
+52:         *  @dev    The `NFT` must have already been created, and the number of buckets to be memorialized at a time determined by function caller.
+
+
+54:         *  @dev    `Pool.approveLPTransferors` must be called prior to calling this method in order to allow `Position manager` contract to transfer redeemed `LP`.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol
+
+24:         *  @dev    Automatically claims any available rewards in all existing buckets. Updates exchange rates for each new bucket the `NFT` is associated with.
+
+
+25:         *  @dev    `fromBuckets_` and `toBuckets_` must be the same array length. Liquidity is moved from the `fromBuckets_` to the `toBuckets_` in the same index.
+
+
+58:         *  @dev    Caller can claim `5%` of the rewards that have accumulated to each bucket since the last burn event, if it hasn't already been updated.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/BorrowerActions.sol
+
+376:                    borrower.t0Debt != 0 && encumberedCollateral == 0 || // case when small amount of debt at a high LUP results in encumbered collateral calculated as 0
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/BorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/BorrowerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/KickerActions.sol
+
+176:            if (vars.amountToDebitFromDeposit > vars.bucketDeposit) vars.amountToDebitFromDeposit = vars.bucketDeposit; // cap the amount to remove at bucket deposit
+
+
+194:                vars.amountToDebitFromDeposit = kickResult_.amountToCoverBond;                                 // cap amount to remove from deposit at amount to cover bond
+
+
+196:                kickResult_.lup = Deposits.getLup(deposits_, poolState_.debt + vars.amountToDebitFromDeposit); // recalculate the LUP with the amount to cover bond
+
+
+197:                kickResult_.amountToCoverBond = 0;                                                             // entire bond is covered from deposit, no additional amount to be send by lender
+
+
+199:                kickResult_.amountToCoverBond -= vars.amountToDebitFromDeposit;                                // lender should send additional amount to cover bond
+
+
+276:            // check that at least two weeks have passed since the last reserve auction completed, and that the auction was not kicked within the past 72 hours
+
+
+371:            // check if NP is not less than price at the limit index provided by the kicker - done to prevent frontrunning kick auction call with a large amount of loan
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/LenderActions.sol
+
+72:        event MoveQuoteToken(address indexed lender, uint256 indexed from, uint256 indexed to, uint256 amount, uint256 lpRedeemedFrom, uint256 lpAwardedTo, uint256 lup);
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/SettlerActions.sol
+
+134:                uint256 assets      = Maths.wmul(poolState_.t0Debt - result_.t0DebtSettled + borrower.t0Debt, poolState_.inflator) + params_.poolBalance;
+
+
+194:         *  @param  borrowerCollateral_    Borrower collateral amount before auction exit (in `NFT` could be fragmented as result of partial takes).
+
+
+196:         *  @return remainingCollateral_   Collateral remaining after auction is settled (same amount for `ERC20` pool, rounded collateral for `ERC721` pool).
+
+
+197:         *  @return compensatedCollateral_ Amount of collateral compensated (`ERC721` settle only), to be deducted from pool pledged collateral accumulator. Always `0` for `ERC20` pools.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/external/TakerActions.sol
+
+85:            bool    isRewarded;               // True if kicker is rewarded (auction price lower than neutral price), false if penalized (auction price greater than neutral price).
+
+
+127:         *  @notice Performs bucket take collateral on an auction, rewards taker and kicker (if case) and updates loan info (settles auction if case).
+
+
+215:                (poolState_.poolType == uint8(PoolType.ERC721) && borrower.collateral < 1e18) || // revert in case of NFT take when there isn't a full token to be taken
+
+
+216:                (poolState_.poolType == uint8(PoolType.ERC20)  && borrower.collateral == 0)      // revert in case of ERC20 take when no collateral to be taken
+
+
+386:                        // taker should send additional quote tokens to cover difference between collateral needed to be taken and rounded collateral, at auction price
+
+
+483:         *  @return settledAuction_        True if auction is settled by the take action. (`NFT` take: rebalance borrower collateral in pool if true)
+
+
+484:         *  @return remainingCollateral_   Borrower collateral remaining after take action. (`NFT` take: collateral to be rebalanced in case of `NFT` settlement)
+
+
+597:         *  @param  depositTake_  If `true` then the take will happen at an auction price equal with bucket price. Auction price is used otherwise.
+
+
+737:            // If there is no unscaled quote token bound, then we pass in max, but that cannot be scaled without an overflow.  So we check in the line below.
+
+
+738:            vars.quoteTokenAmount = (vars.unscaledDeposit != type(uint256).max) ? Maths.wmul(vars.unscaledDeposit, vars.bucketScale) : type(uint256).max;
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/helpers/RevertsHelper.sol
+
+47:         *  @notice Check if head auction is clearable (auction is kicked and `72` hours passed since kick time or auction still has debt but no remaining collateral).
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol)
+
+
+```solidity
+File: ./ajna-core/src/libraries/internal/Loans.sol
+
+21:        @dev    The `Loans` heap is a `Max Heap` data structure (complete binary tree), the root node is the loan with the highest threshold price (`TP`)
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/ExtraordinaryFunding.sol
+
+62:            proposalId_ = _hashProposal(targets_, values_, calldatas_, keccak256(abi.encode(DESCRIPTION_PREFIX_HASH_EXTRAORDINARY, descriptionHash_)));
+
+
+92:            proposalId_ = _hashProposal(targets_, values_, calldatas_, keccak256(abi.encode(DESCRIPTION_PREFIX_HASH_EXTRAORDINARY, keccak256(bytes(description_)))));
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/Funding.sol
+
+70:         * @dev    Voting power is the minimum of the amount of votes available at a snapshot block 33 blocks prior to voting start, and at the vote starting block.
+
+
+72:         * @param snapshot_       One of the block numbers to retrieve the voting power at. 33 blocks prior to the block at which a proposal is available for voting.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/base/StandardFunding.sol
+
+269:         * @dev    Voter must have voted in both the screening and funding stages, and is proportional to their share of votes across the stages.
+
+
+310:            uint256 sum = _validateSlate(distributionId_, currentDistribution.endBlock, currentDistribution.fundsAvailable, proposalIds_, numProposalsInSlate);
+
+
+372:            proposalId_ = _hashProposal(targets_, values_, calldatas_, keccak256(abi.encode(DESCRIPTION_PREFIX_HASH_STANDARD, keccak256(bytes(description_)))));
+
+
+388:            newProposal.tokensRequested = _validateCallDatas(targets_, values_, calldatas_); // check proposal parameters are valid and update tokensRequested
+
+
+421:        function _validateSlate(uint24 distributionId_, uint256 endBlock, uint256 distributionPeriodFundsAvailable_, uint256[] calldata proposalIds_, uint256 numProposalsInSlate_) internal view returns (uint256 sum_) {
+
+
+444:                sum_ += uint128(proposal.fundingVotesReceived); // since we are converting from int128 to uint128, we can safely assume that the value will not overflow
+
+
+541:                uint128 newVotingPower = SafeCast.toUint128(_getVotesFunding(msg.sender, votingPower, voter.remainingVotingPower, screeningStageEndBlock));
+
+
+578:            if (block.number < currentDistribution.startBlock || block.number > _getScreeningStageEndBlock(currentDistribution.endBlock)) revert InvalidVote();
+
+
+668:            // calculate the change in voting power used by the voter in this vote in order to accurately track the total voting power used in the funding stage
+
+
+706:            if (screeningVotesCast[distributionId][account_] + votes_ > _getVotesScreening(distributionId, account_)) revert InsufficientVotingPower();
+
+
+823:                _standardFundingProposals[proposals_[targetProposalId_]].votesReceived > _standardFundingProposals[proposals_[targetProposalId_ - 1]].votesReceived
+
+
+886:         * @param  votingPower_            The voter's voting power in the funding round. Equal to the square of their tokens in the voting snapshot.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/grants/interfaces/IStandardFunding.sol
+
+152:            uint128 votingPower;           // amount of votes originally available to the voter, equal to the sum of the square of their initial votes
+
+
+190:         * @param  targets_         List of contracts the proposal calldata will interact with. Should be the Ajna token contract for all proposals.
+
+
+358:         * @return votingPower          The voter's voting power in the funding round. Equal to the square of their tokens in the voting snapshot.
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol)
+
+
+```solidity
+File: ./ajna-grants/src/token/AjnaToken.sol
+
+45:         *  @notice Called by an owner of AJNA tokens to enable their tokens to be transferred by a spender address without making a seperate permit call
+
+```
+
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+
+
+
+## [NC-8] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
 proving particularly beneficial for address-based filtering. However, gas costs increase with each 
 indexed field during emission, posing a challenge in maximizing the use of the allowable three fields per event. 
