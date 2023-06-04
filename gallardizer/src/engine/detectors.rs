@@ -6,6 +6,7 @@ use crate::utils::file_processor::FileNameWithContent;
 use regex::Regex;
 use solang_parser::pt::Loc;
 
+// A detector that will run in a single file
 pub trait Detector {
     fn run_detector(&mut self, parsed_file: &FileNameWithContent);
     fn get_detector_name(&self) -> String;
@@ -13,13 +14,22 @@ pub trait Detector {
     fn get_detected_issues(&self) -> Vec<IssueAppearance>;
 }
 
+// A global detector that will take all files as input
+pub trait GlobalDetector {
+    fn run_detector(&mut self, parsed_files: &Vec<FileNameWithContent>);
+    fn get_detector_name(&self) -> String;
+    fn get_metadata(&self) -> IssueMetadata;
+    fn get_detected_issues(&self) -> Vec<IssueAppearance>;
+}
+
 pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
-    let detectors: Vec<Box<dyn Detector>> = get_all_detectors();
+    let single_file_detectors: Vec<Box<dyn Detector>> = get_single_detectors();
+    let global_detectors: Vec<Box<dyn GlobalDetector>> = get_global_detectors();
 
     let mut all_detected_issues: Vec<Issue> = Vec::new();
 
-    // print!("Running detectors...\n");
-    for mut detector in detectors {
+    print!("Running single file detectors...\n");
+    for mut detector in single_file_detectors {
         let detector_name = detector.get_detector_name();
 
         // print!("\nCurrently Running: {detector_name}");
@@ -27,6 +37,31 @@ pub fn run_all_detectors(parsed_files: Vec<FileNameWithContent>) -> Vec<Issue> {
         for file in &parsed_files {
             detector.run_detector(&file);
         }
+
+        let detector_detected_issues: Vec<IssueAppearance> = detector.get_detected_issues();
+
+        // Store only detected issues
+        let amount_of_issues_detected = detector_detected_issues.len();
+        // print!("\nIssues Detected: {amount_of_issues_detected}\n");
+
+        if amount_of_issues_detected != 0 {
+            let current_issue_metadata: IssueMetadata = detector.get_metadata();
+            let current_issue: Issue = Issue {
+                issue_appearances: (detector_detected_issues),
+                metadata: (current_issue_metadata),
+            };
+
+            // Store the detected issues for the current detector
+            all_detected_issues.push(current_issue);
+        }
+    }
+
+    print!("Running global detectors...\n");
+    for mut detector in global_detectors {
+        let detector_name = detector.get_detector_name();
+
+        // print!("\nCurrently Running: {detector_name}");
+        detector.run_detector(&parsed_files);
 
         let detector_detected_issues: Vec<IssueAppearance> = detector.get_detected_issues();
 
@@ -139,7 +174,16 @@ use self::{
     },
 };
 
-fn get_all_detectors() -> Vec<Box<dyn Detector>> {
+fn get_global_detectors() -> Vec<Box<dyn GlobalDetector>> {
+    return vec![
+        /* ==== MED ==== */
+        /* ==== LOW ==== */
+        /* ==== NC ==== */
+        /* ==== GAS ==== */
+    ];
+}
+
+fn get_single_detectors() -> Vec<Box<dyn Detector>> {
     return vec![
         /* ==== MED ==== */
         Box::new(safe_mint_erc721::SafeMintERC721 {
