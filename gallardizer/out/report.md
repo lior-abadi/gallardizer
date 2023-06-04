@@ -57,7 +57,9 @@ interface.<br>
 The main difference resides in the checks made after minting that ensure the reception of the token (e.g. Openzeppelin's <code>_checkOnERC721Received</code>).
 Not adhering to this practice can lead to tokens being locked or owned by contracts that aren't equipped to handle them.
 
-*This issue was found 1 time:*
+<details>
+
+*<summary><i>This issue was found 1 time:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -70,6 +72,8 @@ File: ./ajna-core/src/PositionManager.sol
 
 
 
+</details>
+
 ## [M-2] Risk of NFT loss with `transferFrom()`, use `safeTransferFrom()` instead
 The use of `transferFrom()` in transferring NFTs, as outlined in the `EIP-721` [standard](https://github.com/ethereum/EIPs/blob/78e2c297611f5e92b6a5112819ab71f74041ff25/EIPS/eip-721.md?plain=1#L103-L113), 
 places the responsibility on the caller to ensure that the recipient `_to` is capable of 
@@ -79,7 +83,9 @@ By contrast, `safeTransferFrom()` mitigates these risks by performing additional
 the recipient can handle the token transfer. It's highly advised to use `safeTransferFrom()` over 
 `transferFrom()` to avoid the risk of permanent NFT loss.
 
-*This issue was found 3 times:*
+<details>
+
+*<summary><i>This issue was found 3 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721Pool.sol
@@ -105,6 +111,8 @@ File: ./ajna-core/src/RewardsManager.sol
 
 
 
+</details>
+
 # Low Risk Issues
 ## [L-1] Potential precision loss from division with large numbers
 Division operations with large denominators in Solidity may result in a return value of 
@@ -113,7 +121,9 @@ the numerator is always greater than the denominator. A suggested safeguard is t
 minimum value for the numerator, mitigating the risk of unexpected precision loss and improving the 
 accuracy of your computations.
 
-*This issue was found 8 times:*
+<details>
+
+*<summary><i>This issue was found 8 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721Pool.sol
@@ -175,6 +185,8 @@ File: ./ajna-core/src/libraries/internal/Loans.sol
 
 
 
+</details>
+
 ## [L-2] Insecure declaration of <code>pragma</code> version
  The utilization of a flexible pragma version could introduce a variety of potential risks to your contract, 
 accommodating a range of compiler versions which may lack support for specific improvements and changes such as 
@@ -186,7 +198,9 @@ updated pragma version, providing a defense against potential compatibility issu
 language specifications and reducing exposure to bugs fixed in recent compiler versions, all of which contributes 
 to a more stable project.
 
-*This issue was found 2 times:*
+<details>
+
+*<summary><i>This issue was found 2 times:</i></summary>*
 
 ```solidity
 File: ./ajna-grants/src/token/AjnaToken.sol
@@ -209,13 +223,17 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 
 
+</details>
+
 ## [L-3] Denial of service risk from unbounded for-loops with external calls
 Unbounded for-loops making external calls pose a Denial of Service (DOS) risk due to potential gas limitations. 
 This can disrupt contract operation and even lead to a halt in functionalities. To enhance contract stability and 
 resilience against DOS attacks, consider limiting the number of iterations in these loops, thereby controlling gas 
 consumption and ensuring smoother execution.
 
-*This issue was found 5 times:*
+<details>
+
+*<summary><i>This issue was found 5 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721Pool.sol
@@ -254,13 +272,17 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 
 
 
+</details>
+
 ## [L-4] Reversals due to division by zero
 A division operation lacks necessary zero-value checks on any parameter used as denominator, 
 which could result in the function reverting if zero is passed as an argument. It's crucial to implement 
 safeguards against such division by zero errors to prevent unexpected function reverts and maintain the 
 integrity of each contract's calculations.
 
-*This issue was found 5 times:*
+<details>
+
+*<summary><i>This issue was found 5 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
@@ -299,12 +321,16 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 
 
 
+</details>
+
 ## [L-5] Absence of array length validation
 Without explicit checks for arrays to have the same length, user operations 
 might not be completely executed. This is due to the disparity between the number of items 
 involved in the iteration and the number of items in the subsequent arrays.
 
-*This issue was found 3 times:*
+<details>
+
+*<summary><i>This issue was found 3 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/external/LPActions.sol
@@ -345,12 +371,16 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 
 
 
+</details>
+
 # Non-Critical Issues
 ## [NC-1] The <code>nonReentrant</code> modifier should precede all other modifiers
 Prioritizing reentrancy checks before any other calculations or validations within modifiers 
 is a recommended practice for enhancing the security of the protected function.
 
-*This issue was found 1 time:*
+<details>
+
+*<summary><i>This issue was found 1 time:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -365,6 +395,8 @@ File: ./ajna-core/src/PositionManager.sol
 
 
 
+</details>
+
 ## [NC-2] Prefer scientific notation over exponentiation
 Although the compiler effectively optimizes the use of exponentiation, 
 it's generally more advisable to employ scientific notation for representing large numbers. 
@@ -373,7 +405,9 @@ inherently does not require additional compiler optimization.<br>
  
 This practice promotes clarity and efficiency in your code, aligning with robust coding standards.
 
-*This issue was found 9 times:*
+<details>
+
+*<summary><i>This issue was found 9 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
@@ -424,6 +458,8 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 
 
 
+</details>
+
 ## [NC-3] Add descriptive revert reasons
 Include descriptive reason strings in `require()` and `revert()` for 
 improved error handling and user feedback. Since Solidity `0.8.4`, 
@@ -431,7 +467,9 @@ improved error handling and user feedback. Since Solidity `0.8.4`,
 detailed alternative for reversion, facilitating better contract usability and debugging 
 also providing a more efficient way of reverting.
 
-*This issue was found 1 time:*
+<details>
+
+*<summary><i>This issue was found 1 time:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -444,12 +482,16 @@ File: ./ajna-core/src/PositionManager.sol
 
 
 
+</details>
+
 ## [NC-4] Avoid using magic numbers
 It is recommended to define constants instead of relying on hex or numeric literals.
 This practice enhances readability and clarity, even in assembly context, 
 thereby mitigating the potential for confusion or error.
 
-*This issue was found 61 times:*
+<details>
+
+*<summary><i>This issue was found 61 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721PoolFactory.sol
@@ -754,12 +796,16 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 
 
+</details>
+
 ## [NC-5] Time-related numeric values could employ time units
 For readability and consistency, numeric values associated with time should
 utilize predefined [units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#time-units) 
 like seconds, minutes, hours, days, or weeks.
 
-*This issue was found 3 times:*
+<details>
+
+*<summary><i>This issue was found 3 times:</i></summary>*
 
 ```solidity
 File: ./ajna-grants/src/grants/base/StandardFunding.sol
@@ -778,13 +824,17 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 
 
+</details>
+
 ## [NC-6] Expressions defining constant values should employ `immutable` instead of `constant`
 It's important to distinguish between `constant` and `immutable` variables, 
 using each in their appropriate situations. Constants are suitable for literal values 
 hard-coded into the contracts, while `immutables` should be used for expression-based values, such as a call to `keccak256()`, 
 or those calculated/introduced in the `constructor`.
 
-*This issue was found 4 times:*
+<details>
+
+*<summary><i>This issue was found 4 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC20PoolFactory.sol
@@ -827,13 +877,17 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 
 
+</details>
+
 ## [NC-7] Long lines of code
 Traditionally, source code lines are restricted to 80 characters. 
 With contemporary screens being considerably larger, this rule can be somewhat relaxed. 
 The [Solidity style guide](https://docs.soliditylang.org/en/latest/style-guide.html#maximum-line-length), however, suggests a maximum limit of 120 characters per line. 
 Therefore, it's advisable to break up lines when they approach this length.
 
-*This issue was found 91 times:*
+<details>
+
+*<summary><i>This issue was found 91 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC20Pool.sol
@@ -1305,6 +1359,8 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 
 
 
+</details>
+
 ## [NC-8] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
 proving particularly beneficial for address-based filtering. However, gas costs increase with each 
@@ -1313,7 +1369,9 @@ Events with three or more fields should ideally utilize all three indexed fields
 significant concern. In events with fewer than three fields, it's advisable to index all applicable fields, balancing 
 quick accessibility and efficient gas consumption
 
-*This issue was found 15 times:*
+<details>
+
+*<summary><i>This issue was found 15 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/interfaces/pool/IPoolFactory.sol
@@ -1457,6 +1515,8 @@ File: ./ajna-grants/src/grants/interfaces/IGrantFund.sol
 
 
 
+</details>
+
 # Gas Optimizations
 ## [G-1] Adopt custom errors over `revert()/require()` strings
 From Solidity version `0.8.4`, custom errors are available which can offer gas efficiency compared to 
@@ -1465,7 +1525,9 @@ as it bypasses the need to allocate and store the revert string. In addition, om
 strings conserves deployment gas. Switching to custom errors can be a significant optimization, enhancing the 
 performance and cost-effectiveness of your smart contract.
 
-*This issue was found 7 times:*
+<details>
+
+*<summary><i>This issue was found 7 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -1517,6 +1579,8 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 
 
 
+</details>
+
 ## [G-2] Prefer `storage` over `memory` for structs/arrays
 Retrieving data from `storage` and assigning it to a `memory` variable leads to every element of the 
 `struct` or array being loaded from storage, which comes with a gas cost (`Gcoldsload`) of `2100` per element. 
@@ -1528,7 +1592,9 @@ array into a memory variable is only beneficial if the function is returning the
 if it's being passed to a function that needs a memory parameter, or if it's being accessed from another 
 memory struct or array.
 
-*This issue was found 5 times:*
+<details>
+
+*<summary><i>This issue was found 5 times:</i></summary>*
 
 ```solidity
 File: ./ajna-grants/src/grants/base/StandardFunding.sol
@@ -1553,6 +1619,8 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 
 
+</details>
+
 ## [G-3] Use bit shifting for division by two
 The expression `<x> / 2` has the same result as `<x> >> 1`.
 Despite the compiler's use of the `SHR` opcode for both processes, 
@@ -1560,7 +1628,9 @@ the division form involves an additional gas expense of `20` due to
 redirects to a compiler utility function that adds checks. These 
 checks can be bypassed by incorporating `unchecked {}` when dividing by two.
 
-*This issue was found 12 times:*
+<details>
+
+*<summary><i>This issue was found 12 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
@@ -1626,4 +1696,6 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 **Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
 
 
+
+</details>
 
