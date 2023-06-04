@@ -57,7 +57,9 @@ interface.<br>
 The main difference resides in the checks made after minting that ensure the reception of the token (e.g. Openzeppelin's <code>_checkOnERC721Received</code>).
 Not adhering to this practice can lead to tokens being locked or owned by contracts that aren't equipped to handle them.
 
-*This issue was found 1 time:*
+<details>
+
+*<summary><i>This issue was found 1 time:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -66,9 +68,11 @@ File: ./ajna-core/src/PositionManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L238](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L238)
 
 
+
+</details>
 
 ## [M-2] Risk of NFT loss with `transferFrom()`, use `safeTransferFrom()` instead
 The use of `transferFrom()` in transferring NFTs, as outlined in the `EIP-721` [standard](https://github.com/ethereum/EIPs/blob/78e2c297611f5e92b6a5112819ab71f74041ff25/EIPS/eip-721.md?plain=1#L103-L113), 
@@ -79,7 +83,9 @@ By contrast, `safeTransferFrom()` mitigates these risks by performing additional
 the recipient can handle the token transfer. It's highly advised to use `safeTransferFrom()` over 
 `transferFrom()` to avoid the risk of permanent NFT loss.
 
-*This issue was found 3 times:*
+<details>
+
+*<summary><i>This issue was found 3 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721Pool.sol
@@ -88,7 +94,7 @@ File: ./ajna-core/src/ERC721Pool.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L612](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L612)
 
 
 ```solidity
@@ -101,9 +107,11 @@ File: ./ajna-core/src/RewardsManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol#L250](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol#L250)
 
 
+
+</details>
 
 # Low Risk Issues
 ## [L-1] Potential precision loss from division with large numbers
@@ -113,7 +121,9 @@ the numerator is always greater than the denominator. A suggested safeguard is t
 minimum value for the numerator, mitigating the risk of unexpected precision loss and improving the 
 accuracy of your computations.
 
-*This issue was found 8 times:*
+<details>
+
+*<summary><i>This issue was found 8 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721Pool.sol
@@ -125,7 +135,7 @@ File: ./ajna-core/src/ERC721Pool.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L457](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L457)
 
 
 ```solidity
@@ -138,7 +148,7 @@ File: ./ajna-core/src/libraries/external/PoolCommons.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol#L281](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol#L281)
 
 
 ```solidity
@@ -151,7 +161,7 @@ File: ./ajna-core/src/libraries/external/TakerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L356](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L356)
 
 
 ```solidity
@@ -161,7 +171,7 @@ File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L181](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L181)
 
 
 ```solidity
@@ -171,9 +181,11 @@ File: ./ajna-core/src/libraries/internal/Loans.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol#L114](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol#L114)
 
 
+
+</details>
 
 ## [L-2] Insecure declaration of <code>pragma</code> version
  The utilization of a flexible pragma version could introduce a variety of potential risks to your contract, 
@@ -186,7 +198,9 @@ updated pragma version, providing a defense against potential compatibility issu
 language specifications and reducing exposure to bugs fixed in recent compiler versions, all of which contributes 
 to a more stable project.
 
-*This issue was found 2 times:*
+<details>
+
+*<summary><i>This issue was found 2 times:</i></summary>*
 
 ```solidity
 File: ./ajna-grants/src/token/AjnaToken.sol
@@ -195,7 +209,7 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L4](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L4)
 
 
 ```solidity
@@ -205,9 +219,11 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol#L4](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol#L4)
 
 
+
+</details>
 
 ## [L-3] Denial of service risk from unbounded for-loops with external calls
 Unbounded for-loops making external calls pose a Denial of Service (DOS) risk due to potential gas limitations. 
@@ -215,7 +231,9 @@ This can disrupt contract operation and even lead to a halt in functionalities. 
 resilience against DOS attacks, consider limiting the number of iterations in these loops, thereby controlling gas 
 consumption and ensuring smoother execution.
 
-*This issue was found 5 times:*
+<details>
+
+*<summary><i>This issue was found 5 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721Pool.sol
@@ -224,7 +242,7 @@ File: ./ajna-core/src/ERC721Pool.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L561](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L561)
 
 
 ```solidity
@@ -237,7 +255,7 @@ File: ./ajna-core/src/RewardsManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol#L229](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol#L229)
 
 
 ```solidity
@@ -250,9 +268,11 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L62](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L62)
 
 
+
+</details>
 
 ## [L-4] Reversals due to division by zero
 A division operation lacks necessary zero-value checks on any parameter used as denominator, 
@@ -260,7 +280,9 @@ which could result in the function reverting if zero is passed as an argument. I
 safeguards against such division by zero errors to prevent unexpected function reverts and maintain the 
 integrity of each contract's calculations.
 
-*This issue was found 5 times:*
+<details>
+
+*<summary><i>This issue was found 5 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
@@ -272,7 +294,7 @@ File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L248](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L248)
 
 
 ```solidity
@@ -285,7 +307,7 @@ File: ./ajna-core/src/libraries/internal/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol#L22](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol#L22)
 
 
 ```solidity
@@ -295,16 +317,20 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L38](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L38)
 
 
+
+</details>
 
 ## [L-5] Absence of array length validation
 Without explicit checks for arrays to have the same length, user operations 
 might not be completely executed. This is due to the disparity between the number of items 
 involved in the iteration and the number of items in the subsequent arrays.
 
-*This issue was found 3 times:*
+<details>
+
+*<summary><i>This issue was found 3 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/external/LPActions.sol
@@ -326,7 +352,7 @@ File: ./ajna-core/src/libraries/external/LPActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol#L55-L60](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol#L55-L60)
 
 
 ```solidity
@@ -341,16 +367,20 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L52-L57](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L52-L57)
 
 
+
+</details>
 
 # Non-Critical Issues
 ## [NC-1] The <code>nonReentrant</code> modifier should precede all other modifiers
 Prioritizing reentrancy checks before any other calculations or validations within modifiers 
 is a recommended practice for enhancing the security of the protected function.
 
-*This issue was found 1 time:*
+<details>
+
+*<summary><i>This issue was found 1 time:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -361,9 +391,11 @@ File: ./ajna-core/src/PositionManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L262-L264](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L262-L264)
 
 
+
+</details>
 
 ## [NC-2] Prefer scientific notation over exponentiation
 Although the compiler effectively optimizes the use of exponentiation, 
@@ -373,7 +405,9 @@ inherently does not require additional compiler optimization.<br>
  
 This practice promotes clarity and efficiency in your code, aligning with robust coding standards.
 
-*This issue was found 9 times:*
+<details>
+
+*<summary><i>This issue was found 9 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
@@ -382,7 +416,7 @@ File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L102](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L102)
 
 
 ```solidity
@@ -398,7 +432,7 @@ File: ./ajna-core/src/libraries/internal/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol#L42](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol#L42)
 
 
 ```solidity
@@ -420,9 +454,11 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L6](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L6)
 
 
+
+</details>
 
 ## [NC-3] Add descriptive revert reasons
 Include descriptive reason strings in `require()` and `revert()` for 
@@ -431,7 +467,9 @@ improved error handling and user feedback. Since Solidity `0.8.4`,
 detailed alternative for reversion, facilitating better contract usability and debugging 
 also providing a more efficient way of reverting.
 
-*This issue was found 1 time:*
+<details>
+
+*<summary><i>This issue was found 1 time:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -440,16 +478,20 @@ File: ./ajna-core/src/PositionManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L520](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L520)
 
 
+
+</details>
 
 ## [NC-4] Avoid using magic numbers
 It is recommended to define constants instead of relying on hex or numeric literals.
 This practice enhances readability and clarity, even in assembly context, 
 thereby mitigating the potential for confusion or error.
 
-*This issue was found 61 times:*
+<details>
+
+*<summary><i>This issue was found 61 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC721PoolFactory.sol
@@ -458,7 +500,7 @@ File: ./ajna-core/src/ERC721PoolFactory.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol#L62](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol#L62)
 
 
 ```solidity
@@ -471,7 +513,7 @@ File: ./ajna-core/src/PoolInfoUtils.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PoolInfoUtils.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PoolInfoUtils.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PoolInfoUtils.sol#L254](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PoolInfoUtils.sol#L254)
 
 
 ```solidity
@@ -484,7 +526,7 @@ File: ./ajna-core/src/base/PermitERC721.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol#L59](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol#L59)
 
 
 ```solidity
@@ -497,7 +539,7 @@ File: ./ajna-core/src/libraries/external/KickerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol#L277](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol#L277)
 
 
 ```solidity
@@ -531,7 +573,7 @@ File: ./ajna-core/src/libraries/external/PoolCommons.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol#L180](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol#L180)
 
 
 ```solidity
@@ -541,7 +583,7 @@ File: ./ajna-core/src/libraries/external/PositionNFTSVG.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PositionNFTSVG.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PositionNFTSVG.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PositionNFTSVG.sol#L40](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PositionNFTSVG.sol#L40)
 
 
 ```solidity
@@ -551,7 +593,7 @@ File: ./ajna-core/src/libraries/external/SettlerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol#L112](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol#L112)
 
 
 ```solidity
@@ -561,7 +603,7 @@ File: ./ajna-core/src/libraries/external/TakerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L288](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L288)
 
 
 ```solidity
@@ -604,7 +646,7 @@ File: ./ajna-core/src/libraries/helpers/PoolHelper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L82](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/PoolHelper.sol#L82)
 
 
 ```solidity
@@ -617,7 +659,7 @@ File: ./ajna-core/src/libraries/helpers/RevertsHelper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol#L57](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol#L57)
 
 
 ```solidity
@@ -672,7 +714,7 @@ File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol#L15](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol#L15)
 
 
 ```solidity
@@ -685,7 +727,7 @@ File: ./ajna-core/src/libraries/internal/Deposits.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Deposits.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Deposits.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Deposits.sol#L82](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Deposits.sol#L82)
 
 
 ```solidity
@@ -695,7 +737,7 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L125](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L125)
 
 
 ```solidity
@@ -720,7 +762,7 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L292](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L292)
 
 
 ```solidity
@@ -730,7 +772,7 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L19](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L19)
 
 
 ```solidity
@@ -740,7 +782,7 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L13](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L13)
 
 
 ```solidity
@@ -750,16 +792,20 @@ File: ./ajna-grants/src/token/BurnWrapper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol#L50](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/BurnWrapper.sol#L50)
 
 
+
+</details>
 
 ## [NC-5] Time-related numeric values could employ time units
 For readability and consistency, numeric values associated with time should
 utilize predefined [units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#time-units) 
 like seconds, minutes, hours, days, or weeks.
 
-*This issue was found 3 times:*
+<details>
+
+*<summary><i>This issue was found 3 times:</i></summary>*
 
 ```solidity
 File: ./ajna-grants/src/grants/base/StandardFunding.sol
@@ -774,9 +820,11 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L34](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L34)
 
 
+
+</details>
 
 ## [NC-6] Expressions defining constant values should employ `immutable` instead of `constant`
 It's important to distinguish between `constant` and `immutable` variables, 
@@ -784,7 +832,9 @@ using each in their appropriate situations. Constants are suitable for literal v
 hard-coded into the contracts, while `immutables` should be used for expression-based values, such as a call to `keccak256()`, 
 or those calculated/introduced in the `constructor`.
 
-*This issue was found 4 times:*
+<details>
+
+*<summary><i>This issue was found 4 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC20PoolFactory.sol
@@ -793,7 +843,7 @@ File: ./ajna-core/src/ERC20PoolFactory.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol#L28](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20PoolFactory.sol#L28)
 
 
 ```solidity
@@ -803,7 +853,7 @@ File: ./ajna-core/src/ERC721PoolFactory.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol#L30](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol#L30)
 
 
 ```solidity
@@ -813,7 +863,7 @@ File: ./ajna-grants/src/grants/base/ExtraordinaryFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol#L28](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol#L28)
 
 
 ```solidity
@@ -823,9 +873,11 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L51](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L51)
 
 
+
+</details>
 
 ## [NC-7] Long lines of code
 Traditionally, source code lines are restricted to 80 characters. 
@@ -833,7 +885,9 @@ With contemporary screens being considerably larger, this rule can be somewhat r
 The [Solidity style guide](https://docs.soliditylang.org/en/latest/style-guide.html#maximum-line-length), however, suggests a maximum limit of 120 characters per line. 
 Therefore, it's advisable to break up lines when they approach this length.
 
-*This issue was found 91 times:*
+<details>
+
+*<summary><i>This issue was found 91 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/ERC20Pool.sol
@@ -848,7 +902,7 @@ File: ./ajna-core/src/ERC20Pool.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol#L127](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC20Pool.sol#L127)
 
 
 ```solidity
@@ -879,7 +933,7 @@ File: ./ajna-core/src/ERC721Pool.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L134](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721Pool.sol#L134)
 
 
 ```solidity
@@ -895,7 +949,7 @@ File: ./ajna-core/src/ERC721PoolFactory.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol#L17](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/ERC721PoolFactory.sol#L17)
 
 
 ```solidity
@@ -914,7 +968,7 @@ File: ./ajna-core/src/RewardsManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol#L379](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/RewardsManager.sol#L379)
 
 
 ```solidity
@@ -927,7 +981,7 @@ File: ./ajna-core/src/base/Pool.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol#L402](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/Pool.sol#L402)
 
 
 ```solidity
@@ -940,7 +994,7 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol#L11](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolBorrowerActions.sol#L11)
 
 
 ```solidity
@@ -950,7 +1004,7 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolErrors.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolErrors.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolErrors.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolErrors.sol#L44](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolErrors.sol#L44)
 
 
 ```solidity
@@ -960,7 +1014,7 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolInternals.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolInternals.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolInternals.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolInternals.sol#L46](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolInternals.sol#L46)
 
 
 ```solidity
@@ -976,7 +1030,7 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolState.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolState.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolState.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolState.sol#L45](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolState.sol#L45)
 
 
 ```solidity
@@ -989,7 +1043,7 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol#L13](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolTakerActions.sol#L13)
 
 
 ```solidity
@@ -1005,7 +1059,7 @@ File: ./ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol#L12](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc20/IERC20PoolBorrowerActions.sol#L12)
 
 
 ```solidity
@@ -1021,7 +1075,7 @@ File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol#L12](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolBorrowerActions.sol#L12)
 
 
 ```solidity
@@ -1031,7 +1085,7 @@ File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol#L28](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolEvents.sol#L28)
 
 
 ```solidity
@@ -1044,7 +1098,7 @@ File: ./ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol#L26](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/erc721/IERC721PoolLenderActions.sol#L26)
 
 
 ```solidity
@@ -1066,7 +1120,7 @@ File: ./ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol#L22](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/position/IPositionManagerOwnerActions.sol#L22)
 
 
 ```solidity
@@ -1082,7 +1136,7 @@ File: ./ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol#L24](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerOwnerActions.sol#L24)
 
 
 ```solidity
@@ -1092,7 +1146,7 @@ File: ./ajna-core/src/libraries/external/BorrowerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/BorrowerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/BorrowerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/BorrowerActions.sol#L376](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/BorrowerActions.sol#L376)
 
 
 ```solidity
@@ -1120,7 +1174,7 @@ File: ./ajna-core/src/libraries/external/KickerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol#L176](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol#L176)
 
 
 ```solidity
@@ -1130,7 +1184,7 @@ File: ./ajna-core/src/libraries/external/LenderActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol#L72](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LenderActions.sol#L72)
 
 
 ```solidity
@@ -1149,7 +1203,7 @@ File: ./ajna-core/src/libraries/external/SettlerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol#L134](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/SettlerActions.sol#L134)
 
 
 ```solidity
@@ -1186,7 +1240,7 @@ File: ./ajna-core/src/libraries/external/TakerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L85](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L85)
 
 
 ```solidity
@@ -1196,7 +1250,7 @@ File: ./ajna-core/src/libraries/helpers/RevertsHelper.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol#L47](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/RevertsHelper.sol#L47)
 
 
 ```solidity
@@ -1206,7 +1260,7 @@ File: ./ajna-core/src/libraries/internal/Loans.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol#L21](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol#L21)
 
 
 ```solidity
@@ -1219,7 +1273,7 @@ File: ./ajna-grants/src/grants/base/ExtraordinaryFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol#L62](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/ExtraordinaryFunding.sol#L62)
 
 
 ```solidity
@@ -1232,7 +1286,7 @@ File: ./ajna-grants/src/grants/base/Funding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L70](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/Funding.sol#L70)
 
 
 ```solidity
@@ -1275,7 +1329,7 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L269](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L269)
 
 
 ```solidity
@@ -1291,7 +1345,7 @@ File: ./ajna-grants/src/grants/interfaces/IStandardFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol#L152](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IStandardFunding.sol#L152)
 
 
 ```solidity
@@ -1301,9 +1355,11 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L45](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L45)
 
 
+
+</details>
 
 ## [NC-8] Inadequate indexing of event fields
 Indexed event fields enhance accessibility for off-chain tools parsing events, 
@@ -1313,7 +1369,9 @@ Events with three or more fields should ideally utilize all three indexed fields
 significant concern. In events with fewer than three fields, it's advisable to index all applicable fields, balancing 
 quick accessibility and efficient gas consumption
 
-*This issue was found 15 times:*
+<details>
+
+*<summary><i>This issue was found 15 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/interfaces/pool/IPoolFactory.sol
@@ -1322,7 +1380,7 @@ File: ./ajna-core/src/interfaces/pool/IPoolFactory.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/IPoolFactory.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/IPoolFactory.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/IPoolFactory.sol#L42](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/IPoolFactory.sol#L42)
 
 
 ```solidity
@@ -1363,7 +1421,7 @@ File: ./ajna-core/src/interfaces/pool/commons/IPoolEvents.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolEvents.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolEvents.sol#L219-L223](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/pool/commons/IPoolEvents.sol#L219-L223)
 
 
 ```solidity
@@ -1377,7 +1435,7 @@ File: ./ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol#L32-L36](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/interfaces/rewards/IRewardsManagerEvents.sol#L32-L36)
 
 
 ```solidity
@@ -1387,7 +1445,7 @@ File: ./ajna-core/src/libraries/external/KickerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol#L87](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/KickerActions.sol#L87)
 
 
 ```solidity
@@ -1397,7 +1455,7 @@ File: ./ajna-core/src/libraries/external/LPActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol#L28](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/LPActions.sol#L28)
 
 
 ```solidity
@@ -1410,7 +1468,7 @@ File: ./ajna-core/src/libraries/external/PoolCommons.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol#L43](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/PoolCommons.sol#L43)
 
 
 ```solidity
@@ -1420,7 +1478,7 @@ File: ./ajna-core/src/libraries/external/TakerActions.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L103](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/external/TakerActions.sol#L103)
 
 
 ```solidity
@@ -1443,7 +1501,7 @@ File: ./ajna-grants/src/grants/interfaces/IFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IFunding.sol#L49](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IFunding.sol#L49)
 
 
 ```solidity
@@ -1453,9 +1511,11 @@ File: ./ajna-grants/src/grants/interfaces/IGrantFund.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IGrantFund.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IGrantFund.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IGrantFund.sol#L24](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/interfaces/IGrantFund.sol#L24)
 
 
+
+</details>
 
 # Gas Optimizations
 ## [G-1] Adopt custom errors over `revert()/require()` strings
@@ -1465,7 +1525,9 @@ as it bypasses the need to allocate and store the revert string. In addition, om
 strings conserves deployment gas. Switching to custom errors can be a significant optimization, enhancing the 
 performance and cost-effectiveness of your smart contract.
 
-*This issue was found 7 times:*
+<details>
+
+*<summary><i>This issue was found 7 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/PositionManager.sol
@@ -1474,7 +1536,7 @@ File: ./ajna-core/src/PositionManager.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L520](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/PositionManager.sol#L520)
 
 
 ```solidity
@@ -1493,7 +1555,7 @@ File: ./ajna-core/src/base/PermitERC721.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol#L80](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/base/PermitERC721.sol#L80)
 
 
 ```solidity
@@ -1503,7 +1565,7 @@ File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol#L76](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol#L76)
 
 
 ```solidity
@@ -1513,9 +1575,11 @@ File: ./ajna-grants/src/token/AjnaToken.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L28](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/token/AjnaToken.sol#L28)
 
 
+
+</details>
 
 ## [G-2] Prefer `storage` over `memory` for structs/arrays
 Retrieving data from `storage` and assigning it to a `memory` variable leads to every element of the 
@@ -1528,7 +1592,9 @@ array into a memory variable is only beneficial if the function is returning the
 if it's being passed to a function that needs a memory parameter, or if it's being accessed from another 
 memory struct or array.
 
-*This issue was found 5 times:*
+<details>
+
+*<summary><i>This issue was found 5 times:</i></summary>*
 
 ```solidity
 File: ./ajna-grants/src/grants/base/StandardFunding.sol
@@ -1549,9 +1615,11 @@ File: ./ajna-grants/src/grants/base/StandardFunding.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L203](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/base/StandardFunding.sol#L203)
 
 
+
+</details>
 
 ## [G-3] Use bit shifting for division by two
 The expression `<x> / 2` has the same result as `<x> >> 1`.
@@ -1560,7 +1628,9 @@ the division form involves an additional gas expense of `20` due to
 redirects to a compiler utility function that adds checks. These 
 checks can be bypassed by incorporating `unchecked {}` when dividing by two.
 
-*This issue was found 12 times:*
+<details>
+
+*<summary><i>This issue was found 12 times:</i></summary>*
 
 ```solidity
 File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
@@ -1569,7 +1639,7 @@ File: ./ajna-core/src/libraries/helpers/SafeTokenNamer.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol#L80](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/helpers/SafeTokenNamer.sol#L80)
 
 
 ```solidity
@@ -1585,7 +1655,7 @@ File: ./ajna-core/src/libraries/internal/Loans.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol#L136](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Loans.sol#L136)
 
 
 ```solidity
@@ -1604,7 +1674,7 @@ File: ./ajna-core/src/libraries/internal/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol#L14](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-core/src/libraries/internal/Maths.sol#L14)
 
 
 ```solidity
@@ -1623,7 +1693,9 @@ File: ./ajna-grants/src/grants/libraries/Maths.sol
 
 ```
 
-**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol)
+**Location link:** [https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L21](https://github.com/code-423n4/2023-05-ajna/blob/main/ajna-grants/src/grants/libraries/Maths.sol#L21)
 
 
+
+</details>
 

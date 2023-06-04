@@ -267,32 +267,68 @@ fn format_issue(
     // Add the issue description
     md.write(issue.metadata.content.paragraph()).unwrap();
 
+    // Start the details dropdown
+    md.write("<details>".paragraph()).unwrap();
+
     // Add the instances
-    md.write(times_found_prompt.italic().paragraph()).unwrap();
+    let times_found_summary = format!("<summary><i>{}</i></summary>", times_found_prompt);
+    md.write(times_found_summary.italic().paragraph()).unwrap();
 
     // Add the code blocks for each occurrence
     let mut previous_file_path: &String = &mut "".to_string(); // Initialize to empty string
+
+    // Get the first appearance lines of code numbers
+    let mut appearance_lines_to_refer: (&usize, &usize) = (
+        &issue.issue_appearances[0].metadata[0].line,
+        &issue.issue_appearances[0].metadata[&issue.issue_appearances[0].metadata.len() - 1].line,
+    );
+
     for appearance in &issue.issue_appearances {
         let formatted_appearance = format_appearance(
             appearance,
             &appearance.file_path,
             previous_file_path,
             github_link,
+            appearance_lines_to_refer,
         );
+
         md.write(formatted_appearance.paragraph()).unwrap();
+
+        if (&appearance.file_path != previous_file_path) && previous_file_path != "" {
+            appearance_lines_to_refer = (
+                &appearance.metadata[0].line,
+                &appearance.metadata[&appearance.metadata.len() - 1].line,
+            );
+        }
 
         previous_file_path = &appearance.file_path;
     }
 
+    // Close last issue appearance
     md.write("```".paragraph()).unwrap();
+    // Add the location link for the last appearance
     if github_link != "" {
         let file_path_without_prefix = previous_file_path
             .strip_prefix("./")
             .unwrap_or(previous_file_path);
-        let full_link: &String = &format!("{}blob/main/{}", github_link, file_path_without_prefix);
+
+        // We refer to the first line by default
+        let mut full_link: String = format!(
+            "{}blob/main/{}#L{}",
+            github_link, file_path_without_prefix, appearance_lines_to_refer.0
+        );
+
+        // If there are more lines, append them in the link
+        if appearance_lines_to_refer.0 != appearance_lines_to_refer.1 {
+            full_link += &format!("-L{}", appearance_lines_to_refer.1).to_string();
+        }
+
         let full_formatted_link = &format!("**Location link:** [{}]({})\n\n", full_link, full_link);
         md.write(full_formatted_link.paragraph()).unwrap();
     }
+
+    // Close details dropdown
+    md.write("</details>".paragraph()).unwrap();
 }
 
 // Sorts all appearances using the first one as reference
@@ -312,6 +348,7 @@ fn format_appearance(
     current_file_path: &str,
     previous_file_path: &str,
     github_link: &str,
+    appearance_lines_to_refer: (&usize, &usize),
 ) -> String {
     let mut formatted_appearance: String = "".to_string();
 
@@ -325,8 +362,18 @@ fn format_appearance(
                 let file_path_without_prefix = previous_file_path
                     .strip_prefix("./")
                     .unwrap_or(previous_file_path);
-                let full_link: &String =
-                    &format!("{}blob/main/{}", github_link, file_path_without_prefix);
+
+                // We refer to the first line by default
+                let mut full_link: String = format!(
+                    "{}blob/main/{}#L{}",
+                    github_link, file_path_without_prefix, appearance_lines_to_refer.0
+                );
+
+                // If there are more lines, append them in the link
+                if appearance_lines_to_refer.0 != appearance_lines_to_refer.1 {
+                    full_link += &format!("-L{}", appearance_lines_to_refer.1).to_string();
+                }
+
                 formatted_appearance +=
                     &format!("\n**Location link:** [{}]({})\n\n", full_link, full_link);
             }
@@ -365,6 +412,7 @@ fn times_found_text(times_found: &usize) -> String {
 
     return format!("This issue was found {} time:", times_found);
 }
+
 fn remove_auto_generated_backslashes(file_path: &str) -> io::Result<()> {
     let file_content = fs::read_to_string(file_path)?;
 
